@@ -1,0 +1,76 @@
+name:          open-adt
+version:       1.0.0
+cabal-version: >=1.10
+build-type:    Simple
+license:       BSD3
+license-file:  LICENSE
+copyright:     (c) 2018 Jordan Woehr
+homepage:      https://github.com/woehr/open-adt
+bug-reports:   https://github.com/woehr/open-adt/issues
+
+synopsis:      Open algebraic data types allowing reusable constructors that
+               can be added and removed.
+
+description:   This library, built upon row-types, provides types and functions
+               for variants of various functors that all have the same type
+               applied to them. This is very similar to, and inspired by,
+               [haskus-utils-variant](https://github.com/haskus/haskus-utils).
+               At the time of writing, the compile-time performance of
+               haskus-utils-variant is poor for variants with many fields, which
+               should be improved in this package by using row-types.
+
+               The main types of interest in this package are 'VarF' and
+               'OpenADT'. 'VarF' wraps a variant of functors, all over the same
+               type, and provides a functor instance that fmaps over whatever
+               the variant is. 'OpenADT' is the fixed-point type of 'VarF',
+               which allows for recursive structures to be created.
+               
+               A convenience function, 'mkVarPattern' from 'Data.OpenADT.TH',
+               generates patterns that can be used as constructors for variants.
+               The key aspect of these patterns is that they are polymorphic
+               in the type of the row, allowing them to be used as constructors
+               for any open algebraic data type that includes a particular
+               constructor.
+
+               For example usage, see the 'Data.OpenADT.Tutorial' module.
+
+tested-with:   GHC == 8.2.2, GHC == 8.4.3
+
+source-repository head
+  type:     git
+  location: https://github.com/woehr/open-adt
+
+library
+  build-depends: base              >= 4.9
+               , constraints       >= 0.8
+               , recursion-schemes >= 5
+               , row-types         >= 0.2.3
+               , template-haskell  >= 2.11
+
+  exposed-modules:  Data.OpenADT
+                    Data.OpenADT.TH
+                    Data.OpenADT.VarF
+
+  default-language: Haskell2010
+  hs-source-dirs:   lib
+  ghc-options:      -Wall
+                    -Wincomplete-uni-patterns
+                    -Wincomplete-record-updates
+                    -Wredundant-constraints
+
+executable open-adt-tutorial
+  build-depends: base              >= 4.9
+               , deriving-compat   >= 0.3
+               , open-adt
+               , recursion-schemes >= 5
+               , row-types         >= 0.2.3
+               , template-haskell  >= 2.11
+
+  default-language: Haskell2010
+  hs-source-dirs:   src
+  ghc-options:      -Wall
+                    -Wincomplete-uni-patterns
+                    -Wincomplete-record-updates
+                    -Wredundant-constraints
+
+  main-is:          Tutorial.hs
