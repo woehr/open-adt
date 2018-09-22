@@ -1,6 +1,12 @@
--- | Description: Short description
+-- |
+-- Module      : Data.OpenADT.TH
+-- Copyright   : Copyright (c) Jordan Woehr, 2018
+-- License     : BSD
+-- Maintainer  : Jordan Woehr
+-- Stability   : experimental
 --
---   Module description goes here.
+-- This module exports template haskell functions for generating tedious
+-- boilerplate.
 
 {-# Language PatternSynonyms #-}
 {-# Language TemplateHaskell #-}
@@ -38,9 +44,12 @@ import           Data.OpenADT.VarF                        ( OpenAlg
 --
 -- > pattern FooF :: (OpenAlg r "foo" (FooF a) v) => a -> v -> VarF r v
 -- > pattern FooF a v <- VarF (view (Label :: Label "foo") -> Just (FooF' a v))
+-- >
+-- > pattern Foo :: (OpenAlg r "foo" (FooF a) (OpenADT r))
+-- >             => a -> OpenADT r -> OpenADT r
 -- >   where FooF a v = VarF (IsJust (Label :: Label "foo") (FooF' a v))
 -- > pattern Foo  a v = Fix (FooF a v)
-mkVarPattern :: Name   -- ^ The `Name` of the type to create patterns for.
+mkVarPattern :: Name   -- ^ The 'Name' of the type to create patterns for.
              -> String -- ^ The label in the variant the constructor will have.
              -> String -- ^ The name of the fixed pattern.
              -> String -- ^ The name of the unfixed pattern.
@@ -113,6 +122,6 @@ bndrName (KindedTV n _) = n
 bndrToVar :: TyVarBndr -> Type
 bndrToVar = VarT . bndrName
 
--- a -> b
+-- a -> b -> (a -> b)
 funApp :: Q Type -> Q Type -> Q Type
 funApp a b = appT (appT arrowT a) b

@@ -1,7 +1,8 @@
 resolver: lts-12.9
 
 packages:
-- .
+- ./open-adt
+- ./open-adt-tutorial
 
 extra-deps:
 - row-types-0.2.3.0

@@ -1,0 +1,3 @@
+packages: open-adt open-adt-tutorial
+documentation: True
+haddock-hyperlink-source: True
