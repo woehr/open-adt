@@ -1,4 +1,5 @@
 :set -Wall
+:set -Wcompat
 :set -Wincomplete-uni-patterns
 :set -Wincomplete-record-updates
 :set -ilib

@@ -1,5 +1,6 @@
 -- | Description : A short tutorial with code.
 
+{-# Language CPP #-}
 {-# Language DataKinds #-}
 {-# Language DeriveFunctor #-}
 {-# Language FlexibleContexts #-}
@@ -21,6 +22,10 @@
 module Data.OpenADT.Tutorial where
 
 import           Data.OpenADT
+
+#if !(MIN_VERSION_base(4,11,0))
+import           Data.Semigroup                           ( (<>) )
+#endif
 
 -- row-types
 import           Data.Row
@@ -339,9 +344,9 @@ result3 = cata alg exList1
   alg :: Alg (List1F Int) (List2 Int)
   alg (Cons1F a x) = Cons2 a a x
   alg NilF = Nil
-  alg _ = error
-    "Unfortunately using these patterns will always result in non-\
-    \exhaustive pattern match errors, hence the default case. :("
+  alg _ = error $
+    "Unfortunately using these patterns will always result in non-" <>
+    "exhaustive pattern match errors, hence the default case. :("
 
 -- * Explicit Cases
 --
@@ -491,7 +496,7 @@ result6 = fmapList (show @Int) exList2
 --
 --     -- Explicit handling of specified constructors
 --     Left v -> 'caseonF' r v
---     
+--
 --     -- All others handled by fmapList'
 --     Right leftovers -> 'fmapList'' (show @Int) leftovers
 --
@@ -521,7 +526,7 @@ result7 = cata alg exList2 where
 
     -- Explicit handling of specified constructors
     Left v -> caseonF r v
-    
+
     -- All others handled by fmapList'
     Right leftovers -> fmapList' (show @Int) leftovers
 

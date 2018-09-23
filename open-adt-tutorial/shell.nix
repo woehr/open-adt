@@ -4,7 +4,13 @@ let
 
   inherit (nixpkgs) pkgs;
 
-  f = { mkDerivation, base, constraints, deriving-compat, open-adt
+  haskellPackages = if compiler == "default"
+                       then pkgs.haskellPackages
+                       else pkgs.haskell.packages.${compiler};
+
+  open-adt = haskellPackages.callCabal2nix "open-adt" ../open-adt {};
+
+  f = { mkDerivation, base, constraints, deriving-compat
       , recursion-schemes, row-types, stdenv, template-haskell
       }:
       mkDerivation {
@@ -22,10 +28,6 @@ let
         description = "Open algebraic data type examples";
         license = stdenv.lib.licenses.bsd3;
       };
-
-  haskellPackages = if compiler == "default"
-                       then pkgs.haskellPackages
-                       else pkgs.haskell.packages.${compiler};
 
   variant = if doBenchmark then pkgs.haskell.lib.doBenchmark else pkgs.lib.id;
 

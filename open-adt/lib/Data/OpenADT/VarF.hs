@@ -172,7 +172,7 @@ instance Forall r Eq1 => Eq1 (VarF r) where
       Proxy doNil doUncons doCons (Pair (VarF' x) (VarF' y))
 
     where doNil :: Product (VarF' a) (VarF' b) Empty
-                -> Const (Maybe Bool) Empty
+                -> Const (Maybe Bool) (Empty :: Row (* -> *))
           doNil _ = Const Nothing
 
           doUncons :: forall ℓ τ ρ. (KnownSymbol ℓ, Eq1 τ)
