@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-|
+Module:      Data.Foldable.Deriving
+Copyright:   (C) 2015-2017 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Portability: Template Haskell
+
+Exports functions to mechanically derive 'Foldable' instances in a way that mimics
+how the @-XDeriveFoldable@ extension works since GHC 8.0.
+
+These changes make it possible to derive @Foldable@ instances for data types with
+existential constraints, e.g.,
+
+@
+data WrappedSet a where
+    WrapSet :: Ord a =&gt; a -&gt; WrappedSet a
+
+deriving instance Foldable WrappedSet -- On GHC 8.0  on later
+$(deriveFoldable ''WrappedSet)        -- On GHC 7.10 and earlier
+@
+
+In addition, derived 'Foldable' instances from this module do not generate
+superfluous 'mempty' expressions in its implementation of 'foldMap'. One can
+verify this by compiling a module that uses 'deriveFoldable' with the
+@-ddump-splices@ GHC flag.
+
+For more info on these changes, see
+&lt;https://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/DeriveFunctor this GHC wiki page&gt;.
+-}</span><span>
+</span><a name="line-30"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Foldable.Deriving</span><span> </span><span class="hs-special">(</span><span>
+</span><a name="line-31"></a><span>      </span><span class="hs-comment">-- * 'Foldable'</span><span>
+</span><a name="line-32"></a><span>      </span><a href="Data.Functor.Deriving.Internal.html#deriveFoldable"><span class="hs-identifier hs-var">deriveFoldable</span></a><span>
+</span><a name="line-33"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Functor.Deriving.Internal.html#deriveFoldableOptions"><span class="hs-identifier hs-var">deriveFoldableOptions</span></a><span>
+</span><a name="line-34"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Functor.Deriving.Internal.html#makeFoldMap"><span class="hs-identifier hs-var">makeFoldMap</span></a><span>
+</span><a name="line-35"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Functor.Deriving.Internal.html#makeFoldMapOptions"><span class="hs-identifier hs-var">makeFoldMapOptions</span></a><span>
+</span><a name="line-36"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Functor.Deriving.Internal.html#makeFoldr"><span class="hs-identifier hs-var">makeFoldr</span></a><span>
+</span><a name="line-37"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Functor.Deriving.Internal.html#makeFoldrOptions"><span class="hs-identifier hs-var">makeFoldrOptions</span></a><span>
+</span><a name="line-38"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Functor.Deriving.Internal.html#makeFold"><span class="hs-identifier hs-var">makeFold</span></a><span>
+</span><a name="line-39"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Functor.Deriving.Internal.html#makeFoldOptions"><span class="hs-identifier hs-var">makeFoldOptions</span></a><span>
+</span><a name="line-40"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Functor.Deriving.Internal.html#makeFoldl"><span class="hs-identifier hs-var">makeFoldl</span></a><span>
+</span><a name="line-41"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Functor.Deriving.Internal.html#makeFoldlOptions"><span class="hs-identifier hs-var">makeFoldlOptions</span></a><span>
+</span><a name="line-42"></a><span>      </span><span class="hs-comment">-- * 'FFTOptions'</span><span>
+</span><a name="line-43"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Functor.Deriving.Internal.html#FFTOptions"><span class="hs-identifier hs-type">FFTOptions</span></a><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><a name="line-44"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Functor.Deriving.Internal.html#defaultFFTOptions"><span class="hs-identifier hs-var">defaultFFTOptions</span></a><span>
+</span><a name="line-45"></a><span>      </span><span class="hs-comment">-- * 'deriveFoldable' limitations</span><span>
+</span><a name="line-46"></a><span>      </span><span class="hs-comment">-- $constraints</span><span>
+</span><a name="line-47"></a><span>    </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-48"></a><span>
+</span><a name="line-49"></a><span class="hs-keyword">import</span><span> </span><a href="Data.Functor.Deriving.Internal.html"><span class="hs-identifier">Data.Functor.Deriving.Internal</span></a><span>
+</span><a name="line-50"></a><span>
+</span><a name="line-51"></a><span class="hs-comment">{- $constraints
+
+Be aware of the following potential gotchas:
+
+* If you are using the @-XGADTs@ or @-XExistentialQuantification@ extensions, an
+  existential constraint cannot mention the last type variable. For example,
+  @data Illegal a = forall a. Show a =&gt; Illegal a@ cannot have a derived
+  'Functor' instance.
+
+* Type variables of kind @* -&gt; *@ are assumed to have 'Foldable' constraints.
+  If this is not desirable, use 'makeFoldr' or 'makeFoldMap'.
+-}</span><span>
+</span><a name="line-63"></a></pre></body></html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE CPP #-}</span><span>
+</span><a name="line-2"></a><span class="hs-comment">{-|
+Module:      Data.Ord.Deriving
+Copyright:   (C) 2015-2017 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Portability: Template Haskell
+
+Exports functions to mechanically derive 'Ord', 'Ord1', and 'Ord2' instances.
+-}</span><span>
+</span><a name="line-11"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Ord.Deriving</span><span> </span><span class="hs-special">(</span><span>
+</span><a name="line-12"></a><span>      </span><span class="hs-comment">-- * 'Ord'</span><span>
+</span><a name="line-13"></a><span>      </span><a href="Data.Ord.Deriving.Internal.html#deriveOrd"><span class="hs-identifier hs-var">deriveOrd</span></a><span>
+</span><a name="line-14"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Ord.Deriving.Internal.html#makeCompare"><span class="hs-identifier hs-var">makeCompare</span></a><span>
+</span><a name="line-15"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Ord.Deriving.Internal.html#makeLT"><span class="hs-identifier hs-var">makeLT</span></a><span>
+</span><a name="line-16"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Ord.Deriving.Internal.html#makeLE"><span class="hs-identifier hs-var">makeLE</span></a><span>
+</span><a name="line-17"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Ord.Deriving.Internal.html#makeGT"><span class="hs-identifier hs-var">makeGT</span></a><span>
+</span><a name="line-18"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Ord.Deriving.Internal.html#makeGE"><span class="hs-identifier hs-var">makeGE</span></a><span>
+</span><a name="line-19"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Ord.Deriving.Internal.html#makeMax"><span class="hs-identifier hs-var">makeMax</span></a><span>
+</span><a name="line-20"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Ord.Deriving.Internal.html#makeMin"><span class="hs-identifier hs-var">makeMin</span></a><span>
+</span><a name="line-21"></a><span>      </span><span class="hs-comment">-- * 'Ord1'</span><span>
+</span><a name="line-22"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Ord.Deriving.Internal.html#deriveOrd1"><span class="hs-identifier hs-var">deriveOrd1</span></a><span>
+</span><a name="line-23"></a><span class="hs-cpp">#if defined(NEW_FUNCTOR_CLASSES)
+</span><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Ord.Deriving.Internal.html#makeLiftCompare"><span class="hs-identifier hs-var">makeLiftCompare</span></a><span>
+</span><a name="line-25"></a><span class="hs-cpp">#endif
+</span><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Ord.Deriving.Internal.html#makeCompare1"><span class="hs-identifier hs-var">makeCompare1</span></a><span>
+</span><a name="line-27"></a><span class="hs-cpp">#if defined(NEW_FUNCTOR_CLASSES)
+</span><span>      </span><span class="hs-comment">-- * 'Ord2'</span><span>
+</span><a name="line-29"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Ord.Deriving.Internal.html#deriveOrd2"><span class="hs-identifier hs-var">deriveOrd2</span></a><span>
+</span><a name="line-30"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Ord.Deriving.Internal.html#makeLiftCompare2"><span class="hs-identifier hs-var">makeLiftCompare2</span></a><span>
+</span><a name="line-31"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Ord.Deriving.Internal.html#makeCompare2"><span class="hs-identifier hs-var">makeCompare2</span></a><span>
+</span><a name="line-32"></a><span class="hs-cpp">#endif
+</span><span>      </span><span class="hs-comment">-- * 'deriveOrd' limitations</span><span>
+</span><a name="line-34"></a><span>      </span><span class="hs-comment">-- $constraints</span><span>
+</span><a name="line-35"></a><span>    </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-36"></a><span>
+</span><a name="line-37"></a><span class="hs-keyword">import</span><span> </span><a href="Data.Ord.Deriving.Internal.html"><span class="hs-identifier">Data.Ord.Deriving.Internal</span></a><span>
+</span><a name="line-38"></a><span>
+</span><a name="line-39"></a><span class="hs-comment">{- $constraints
+
+Be aware of the following potential gotchas:
+
+* Type variables of kind @*@ are assumed to have 'Ord' constraints.
+  Type variables of kind @* -&gt; *@ are assumed to have 'Ord1' constraints.
+  Type variables of kind @* -&gt; * -&gt; *@ are assumed to have 'Ord2' constraints.
+  If this is not desirable, use 'makeCompare' or one of its cousins.
+
+* The 'Ord1' class had a different definition in @transformers-0.4@, and as a result,
+  'deriveOrd1' implements different instances for the @transformers-0.4@ 'Ord1' than
+  it otherwise does. Also, 'makeLiftCompare' is not available
+  when this library is built against @transformers-0.4@, only 'makeCompare1.
+
+* The 'Ord2' class is not available in @transformers-0.4@, and as a
+  result, neither are Template Haskell functions that deal with 'Ord2' when this
+  library is built against @transformers-0.4@.
+-}</span><span>
+</span><a name="line-57"></a></pre></body></html>

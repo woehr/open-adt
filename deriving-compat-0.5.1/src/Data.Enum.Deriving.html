@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-|
+Module:      Data.Enum.Deriving
+Copyright:   (C) 2015-2017 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Portability: Template Haskell
+
+Exports functions to mechanically derive 'Enum' instances.
+-}</span><span>
+</span><a name="line-10"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Enum.Deriving</span><span> </span><span class="hs-special">(</span><span>
+</span><a name="line-11"></a><span>      </span><span class="hs-comment">-- * 'Enum'</span><span>
+</span><a name="line-12"></a><span>      </span><a href="Data.Enum.Deriving.Internal.html#deriveEnum"><span class="hs-identifier hs-var">deriveEnum</span></a><span>
+</span><a name="line-13"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Enum.Deriving.Internal.html#makeSucc"><span class="hs-identifier hs-var">makeSucc</span></a><span>
+</span><a name="line-14"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Enum.Deriving.Internal.html#makePred"><span class="hs-identifier hs-var">makePred</span></a><span>
+</span><a name="line-15"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Enum.Deriving.Internal.html#makeToEnum"><span class="hs-identifier hs-var">makeToEnum</span></a><span>
+</span><a name="line-16"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Enum.Deriving.Internal.html#makeFromEnum"><span class="hs-identifier hs-var">makeFromEnum</span></a><span>
+</span><a name="line-17"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Enum.Deriving.Internal.html#makeEnumFrom"><span class="hs-identifier hs-var">makeEnumFrom</span></a><span>
+</span><a name="line-18"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Enum.Deriving.Internal.html#makeEnumFromThen"><span class="hs-identifier hs-var">makeEnumFromThen</span></a><span>
+</span><a name="line-19"></a><span>      </span><span class="hs-comment">-- * 'deriveEnum' limitations</span><span>
+</span><a name="line-20"></a><span>      </span><span class="hs-comment">-- $constraints</span><span>
+</span><a name="line-21"></a><span>    </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-22"></a><span>
+</span><a name="line-23"></a><span class="hs-keyword">import</span><span> </span><a href="Data.Enum.Deriving.Internal.html"><span class="hs-identifier">Data.Enum.Deriving.Internal</span></a><span>
+</span><a name="line-24"></a><span>
+</span><a name="line-25"></a><span class="hs-comment">{- $constraints
+
+Be aware of the following potential gotchas:
+
+* Type variables of kind @*@ are assumed to have 'Enum' constraints.
+  If this is not desirable, use 'makeToEnum' or one of its cousins.
+-}</span><span>
+</span><a name="line-32"></a></pre></body></html>

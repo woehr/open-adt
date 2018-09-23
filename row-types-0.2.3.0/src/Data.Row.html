@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-----------------------------------------------------------------------------</span><span>
+</span><a name="line-2"></a><span class="hs-comment">-- |</span><span>
+</span><a name="line-3"></a><span class="hs-comment">-- Module      :  Data.Row</span><span>
+</span><a name="line-4"></a><span class="hs-comment">--</span><span>
+</span><a name="line-5"></a><span class="hs-comment">-- This module includes a set of common functions for Records and Variants.</span><span>
+</span><a name="line-6"></a><span class="hs-comment">-- It includes:</span><span>
+</span><a name="line-7"></a><span class="hs-comment">--</span><span>
+</span><a name="line-8"></a><span class="hs-comment">-- * Common constructors, destructors, and querying functions</span><span>
+</span><a name="line-9"></a><span class="hs-comment">--</span><span>
+</span><a name="line-10"></a><span class="hs-comment">-- It specifically excludes:</span><span>
+</span><a name="line-11"></a><span class="hs-comment">--</span><span>
+</span><a name="line-12"></a><span class="hs-comment">-- * Functions that have the same name for Records and Variants (e.g. 'focus',</span><span>
+</span><a name="line-13"></a><span class="hs-comment">--   'update', 'fromLabels', etc.)</span><span>
+</span><a name="line-14"></a><span class="hs-comment">--</span><span>
+</span><a name="line-15"></a><span class="hs-comment">-- * Common clashes with the standard Prelude or other modules (e.g. 'map',</span><span>
+</span><a name="line-16"></a><span class="hs-comment">--   'sequence', 'zip', 'Map', etc.)</span><span>
+</span><a name="line-17"></a><span class="hs-comment">--</span><span>
+</span><a name="line-18"></a><span class="hs-comment">-- If these particular functions are needed, they should be brought in qualified</span><span>
+</span><a name="line-19"></a><span class="hs-comment">-- from one of the Data.Row.*** modules directly.</span><span>
+</span><a name="line-20"></a><span class="hs-comment">--</span><span>
+</span><a name="line-21"></a><span class="hs-comment">-----------------------------------------------------------------------------</span><span>
+</span><a name="line-22"></a><span>
+</span><a name="line-23"></a><span>
+</span><a name="line-24"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Row</span><span>
+</span><a name="line-25"></a><span>  </span><span class="hs-special">(</span><span>
+</span><a name="line-26"></a><span>  </span><span class="hs-comment">-- * Types and constraints</span><span>
+</span><a name="line-27"></a><span>    </span><a href="Data.Row.Internal.html#Label"><span class="hs-identifier hs-type">Label</span></a><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><a name="line-28"></a><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">KnownSymbol</span><span class="hs-special">,</span><span> </span><a href="Data.Row.Internal.html#AllUniqueLabels"><span class="hs-identifier hs-type">AllUniqueLabels</span></a><span class="hs-special">,</span><span> </span><a href="Data.Row.Internal.html#WellBehaved"><span class="hs-identifier hs-type">WellBehaved</span></a><span>
+</span><a name="line-29"></a><span>  </span><span class="hs-special">,</span><span> </span><a href="Data.Row.Variants.html#Var"><span class="hs-identifier hs-type">Var</span></a><span class="hs-special">,</span><span> </span><a href="Data.Row.Records.html#Rec"><span class="hs-identifier hs-type">Rec</span></a><span class="hs-special">,</span><span> </span><a href="Data.Row.Internal.html#Row"><span class="hs-identifier hs-type">Row</span></a><span class="hs-special">,</span><span> </span><a href="Data.Row.Internal.html#Empty"><span class="hs-identifier hs-type">Empty</span></a><span class="hs-special">,</span><span> </span><span class="hs-keyword">type</span><span> </span><span class="hs-special">(</span><a href="Data.Row.Internal.html#%2248"><span class="hs-operator hs-type">&#8776;</span></a><span class="hs-special">)</span><span>
+</span><a name="line-30"></a><span>  </span><span class="hs-special">,</span><span> </span><a href="Data.Row.Internal.html#HasType"><span class="hs-identifier hs-type">HasType</span></a><span class="hs-special">,</span><span> </span><a href="Data.Row.Internal.html#Lacks"><span class="hs-identifier hs-type">Lacks</span></a><span class="hs-special">,</span><span> </span><span class="hs-keyword">type</span><span> </span><span class="hs-special">(</span><a href="Data.Row.Internal.html#.%5C"><span class="hs-operator hs-type">.\</span></a><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="hs-keyword">type</span><span> </span><span class="hs-special">(</span><a href="Data.Row.Internal.html#.%2B"><span class="hs-operator hs-type">.+</span></a><span class="hs-special">)</span><span>
+</span><a name="line-31"></a><span>  </span><span class="hs-special">,</span><span> </span><a href="Data.Row.Internal.html#Forall"><span class="hs-identifier hs-type">Forall</span></a><span class="hs-special">,</span><span> </span><a href="Data.Row.Switch.html#Switch"><span class="hs-identifier hs-type">Switch</span></a><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><a name="line-32"></a><span>  </span><span class="hs-comment">-- * Record Construction</span><span>
+</span><a name="line-33"></a><span>  </span><span class="hs-special">,</span><span> </span><a href="Data.Row.Records.html#empty"><span class="hs-identifier hs-var">empty</span></a><span>
+</span><a name="line-34"></a><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">type</span><span> </span><span class="hs-special">(</span><a href="Data.Row.Internal.html#.%3D%3D"><span class="hs-operator hs-type">.==</span></a><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><a href="Data.Row.Records.html#.%3D%3D"><span class="hs-operator hs-var">.==</span></a><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="hs-special">(</span><a href="Data.Row.Records.html#%3A%3D%3D"><span class="hs-operator hs-var">:==</span></a><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><a href="Data.Row.Records.html#unSingleton"><span class="hs-identifier hs-var">unSingleton</span></a><span>
+</span><a name="line-35"></a><span>  </span><span class="hs-comment">-- ** Restriction</span><span>
+</span><a name="line-36"></a><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">type</span><span> </span><span class="hs-special">(</span><a href="Data.Row.Internal.html#.-"><span class="hs-operator hs-type">.-</span></a><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><a href="Data.Row.Records.html#.-"><span class="hs-operator hs-var">.-</span></a><span class="hs-special">)</span><span>
+</span><a name="line-37"></a><span>  </span><span class="hs-comment">-- ** Query</span><span>
+</span><a name="line-38"></a><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">type</span><span> </span><span class="hs-special">(</span><a href="Data.Row.Internal.html#.%21"><span class="hs-operator hs-type">.!</span></a><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><a href="Data.Row.Records.html#.%21"><span class="hs-operator hs-var">.!</span></a><span class="hs-special">)</span><span>
+</span><a name="line-39"></a><span>  </span><span class="hs-comment">-- ** Disjoint union</span><span>
+</span><a name="line-40"></a><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><a href="Data.Row.Records.html#.%2B"><span class="hs-operator hs-var">.+</span></a><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><a href="Data.Row.Internal.html#Disjoint"><span class="hs-identifier hs-type">Disjoint</span></a><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="hs-special">(</span><a href="Data.Row.Records.html#%3A%2B"><span class="hs-operator hs-var">:+</span></a><span class="hs-special">)</span><span>
+</span><a name="line-41"></a><span>  </span><span class="hs-comment">-- * Variant construction</span><span>
+</span><a name="line-42"></a><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><a href="Data.Row.Variants.html#IsJust"><span class="hs-identifier hs-var">IsJust</span></a><span>
+</span><a name="line-43"></a><span>  </span><span class="hs-comment">-- ** Restriction</span><span>
+</span><a name="line-44"></a><span>  </span><span class="hs-special">,</span><span> </span><a href="Data.Row.Variants.html#diversify"><span class="hs-identifier hs-var">diversify</span></a><span class="hs-special">,</span><span> </span><span class="hs-keyword">type</span><span> </span><span class="hs-special">(</span><a href="Data.Row.Internal.html#.%5C%2F"><span class="hs-operator hs-type">.\/</span></a><span class="hs-special">)</span><span>
+</span><a name="line-45"></a><span>  </span><span class="hs-comment">-- ** Destruction</span><span>
+</span><a name="line-46"></a><span>  </span><span class="hs-special">,</span><span> </span><a href="Data.Row.Variants.html#impossible"><span class="hs-identifier hs-var">impossible</span></a><span class="hs-special">,</span><span> </span><a href="Data.Row.Variants.html#trial"><span class="hs-identifier hs-var">trial</span></a><span class="hs-special">,</span><span> </span><a href="Data.Row.Variants.html#trial%27"><span class="hs-identifier hs-var">trial'</span></a><span class="hs-special">,</span><span> </span><a href="Data.Row.Variants.html#multiTrial"><span class="hs-identifier hs-var">multiTrial</span></a><span>
+</span><a name="line-47"></a><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">type</span><span> </span><span class="hs-special">(</span><a href="Data.Row.Internal.html#.%5C%5C"><span class="hs-operator hs-type">.\\</span></a><span class="hs-special">)</span><span>
+</span><a name="line-48"></a><span>  </span><span class="hs-comment">-- * Labels</span><span>
+</span><a name="line-49"></a><span>  </span><span class="hs-special">,</span><span> </span><a href="Data.Row.Internal.html#labels"><span class="hs-identifier hs-var">labels</span></a><span>
+</span><a name="line-50"></a><span>  </span><span class="hs-special">)</span><span>
+</span><a name="line-51"></a><span class="hs-keyword">where</span><span>
+</span><a name="line-52"></a><span>
+</span><a name="line-53"></a><span class="hs-keyword">import</span><span> </span><a href="Data.Row.Variants.html"><span class="hs-identifier">Data.Row.Variants</span></a><span>
+</span><a name="line-54"></a><span class="hs-keyword">import</span><span> </span><a href="Data.Row.Records.html"><span class="hs-identifier">Data.Row.Records</span></a><span>
+</span><a name="line-55"></a><span class="hs-keyword">import</span><span> </span><a href="Data.Row.Switch.html"><span class="hs-identifier">Data.Row.Switch</span></a><span>
+</span><a name="line-56"></a><span>
+</span><a name="line-57"></a><span>
+</span><a name="line-58"></a><span>
+</span><a name="line-59"></a></pre></body></html>

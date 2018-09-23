@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-|
+Module:      Data.Bounded.Deriving
+Copyright:   (C) 2015-2017 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Portability: Template Haskell
+
+Exports functions to mechanically derive 'Bounded' instances.
+-}</span><span>
+</span><a name="line-10"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Bounded.Deriving</span><span> </span><span class="hs-special">(</span><span>
+</span><a name="line-11"></a><span>      </span><span class="hs-comment">-- * 'Bounded'</span><span>
+</span><a name="line-12"></a><span>      </span><a href="Data.Bounded.Deriving.Internal.html#deriveBounded"><span class="hs-identifier hs-var">deriveBounded</span></a><span>
+</span><a name="line-13"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Bounded.Deriving.Internal.html#makeMinBound"><span class="hs-identifier hs-var">makeMinBound</span></a><span>
+</span><a name="line-14"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Data.Bounded.Deriving.Internal.html#makeMaxBound"><span class="hs-identifier hs-var">makeMaxBound</span></a><span>
+</span><a name="line-15"></a><span>      </span><span class="hs-comment">-- * 'deriveBounded' limitations</span><span>
+</span><a name="line-16"></a><span>      </span><span class="hs-comment">-- $constraints</span><span>
+</span><a name="line-17"></a><span>    </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-18"></a><span>
+</span><a name="line-19"></a><span class="hs-keyword">import</span><span> </span><a href="Data.Bounded.Deriving.Internal.html"><span class="hs-identifier">Data.Bounded.Deriving.Internal</span></a><span>
+</span><a name="line-20"></a><span>
+</span><a name="line-21"></a><span class="hs-comment">{- $constraints
+
+Be aware of the following potential gotchas:
+
+* Type variables of kind @*@ are assumed to have 'Bounded' constraints.
+  If this is not desirable, use 'makeMinBound' or one of its cousins.
+-}</span><span>
+</span><a name="line-28"></a></pre></body></html>

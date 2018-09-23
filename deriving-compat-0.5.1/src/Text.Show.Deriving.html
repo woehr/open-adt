@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE CPP #-}</span><span>
+</span><a name="line-2"></a><span class="hs-comment">{-|
+Module:      Text.Show.Deriving
+Copyright:   (C) 2015-2017 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Portability: Template Haskell
+
+Exports functions to mechanically derive 'Show', 'Show1', and 'Show2' instances.
+-}</span><span>
+</span><a name="line-11"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Text.Show.Deriving</span><span> </span><span class="hs-special">(</span><span>
+</span><a name="line-12"></a><span>      </span><span class="hs-comment">-- * 'Show'</span><span>
+</span><a name="line-13"></a><span>      </span><a href="Text.Show.Deriving.Internal.html#deriveShow"><span class="hs-identifier hs-var">deriveShow</span></a><span>
+</span><a name="line-14"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#deriveShowOptions"><span class="hs-identifier hs-var">deriveShowOptions</span></a><span>
+</span><a name="line-15"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#makeShowsPrec"><span class="hs-identifier hs-var">makeShowsPrec</span></a><span>
+</span><a name="line-16"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#makeShowsPrecOptions"><span class="hs-identifier hs-var">makeShowsPrecOptions</span></a><span>
+</span><a name="line-17"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#makeShow"><span class="hs-identifier hs-var">makeShow</span></a><span>
+</span><a name="line-18"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#makeShowOptions"><span class="hs-identifier hs-var">makeShowOptions</span></a><span>
+</span><a name="line-19"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#makeShowList"><span class="hs-identifier hs-var">makeShowList</span></a><span>
+</span><a name="line-20"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#makeShowListOptions"><span class="hs-identifier hs-var">makeShowListOptions</span></a><span>
+</span><a name="line-21"></a><span>      </span><span class="hs-comment">-- * 'Show1'</span><span>
+</span><a name="line-22"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#deriveShow1"><span class="hs-identifier hs-var">deriveShow1</span></a><span>
+</span><a name="line-23"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#deriveShow1Options"><span class="hs-identifier hs-var">deriveShow1Options</span></a><span>
+</span><a name="line-24"></a><span class="hs-cpp">#if defined(NEW_FUNCTOR_CLASSES)
+</span><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#makeLiftShowsPrec"><span class="hs-identifier hs-var">makeLiftShowsPrec</span></a><span>
+</span><a name="line-26"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#makeLiftShowsPrecOptions"><span class="hs-identifier hs-var">makeLiftShowsPrecOptions</span></a><span>
+</span><a name="line-27"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#makeLiftShowList"><span class="hs-identifier hs-var">makeLiftShowList</span></a><span>
+</span><a name="line-28"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#makeLiftShowListOptions"><span class="hs-identifier hs-var">makeLiftShowListOptions</span></a><span>
+</span><a name="line-29"></a><span class="hs-cpp">#endif
+</span><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#makeShowsPrec1"><span class="hs-identifier hs-var">makeShowsPrec1</span></a><span>
+</span><a name="line-31"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#makeShowsPrec1Options"><span class="hs-identifier hs-var">makeShowsPrec1Options</span></a><span>
+</span><a name="line-32"></a><span class="hs-cpp">#if defined(NEW_FUNCTOR_CLASSES)
+</span><span>      </span><span class="hs-comment">-- * 'Show2'</span><span>
+</span><a name="line-34"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#deriveShow2"><span class="hs-identifier hs-var">deriveShow2</span></a><span>
+</span><a name="line-35"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#deriveShow2Options"><span class="hs-identifier hs-var">deriveShow2Options</span></a><span>
+</span><a name="line-36"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#makeLiftShowsPrec2"><span class="hs-identifier hs-var">makeLiftShowsPrec2</span></a><span>
+</span><a name="line-37"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#makeLiftShowsPrec2Options"><span class="hs-identifier hs-var">makeLiftShowsPrec2Options</span></a><span>
+</span><a name="line-38"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#makeLiftShowList2"><span class="hs-identifier hs-var">makeLiftShowList2</span></a><span>
+</span><a name="line-39"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#makeLiftShowList2Options"><span class="hs-identifier hs-var">makeLiftShowList2Options</span></a><span>
+</span><a name="line-40"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#makeShowsPrec2"><span class="hs-identifier hs-var">makeShowsPrec2</span></a><span>
+</span><a name="line-41"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#makeShowsPrec2Options"><span class="hs-identifier hs-var">makeShowsPrec2Options</span></a><span>
+</span><a name="line-42"></a><span class="hs-cpp">#endif
+</span><span>      </span><span class="hs-comment">-- * 'ShowOptions'</span><span>
+</span><a name="line-44"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#ShowOptions"><span class="hs-identifier hs-type">ShowOptions</span></a><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><a name="line-45"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#defaultShowOptions"><span class="hs-identifier hs-var">defaultShowOptions</span></a><span>
+</span><a name="line-46"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Text.Show.Deriving.Internal.html#legacyShowOptions"><span class="hs-identifier hs-var">legacyShowOptions</span></a><span>
+</span><a name="line-47"></a><span>      </span><span class="hs-comment">-- * 'deriveShow' limitations</span><span>
+</span><a name="line-48"></a><span>      </span><span class="hs-comment">-- $constraints</span><span>
+</span><a name="line-49"></a><span>    </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-50"></a><span>
+</span><a name="line-51"></a><span class="hs-keyword">import</span><span> </span><a href="Text.Show.Deriving.Internal.html"><span class="hs-identifier">Text.Show.Deriving.Internal</span></a><span>
+</span><a name="line-52"></a><span>
+</span><a name="line-53"></a><span class="hs-comment">{- $constraints
+
+Be aware of the following potential gotchas:
+
+* Type variables of kind @*@ are assumed to have 'Show' constraints.
+  Type variables of kind @* -&gt; *@ are assumed to have 'Show1' constraints.
+  Type variables of kind @* -&gt; * -&gt; *@ are assumed to have 'Show2' constraints.
+  If this is not desirable, use 'makeShowsPrec' or one of its cousins.
+
+* The 'Show1' class had a different definition in @transformers-0.4@, and as a result,
+  'deriveShow1' implements different instances for the @transformers-0.4@ 'Show1' than
+  it otherwise does. Also, 'makeLiftShowsPrec' and 'makeLiftShowList' are not available
+  when this library is built against @transformers-0.4@, only 'makeShowsPrec1.
+
+* The 'Show2' class is not available in @transformers-0.4@, and as a
+  result, neither are Template Haskell functions that deal with 'Show2' when this
+  library is built against @transformers-0.4@.
+-}</span><span>
+</span><a name="line-71"></a></pre></body></html>

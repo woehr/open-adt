@@ -1,0 +1,16 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>open-adt-1.0: Open algebraic data types.</title><link href="ocean.css" rel="stylesheet" type="text/css" title="Ocean" /><link rel="stylesheet" type="text/css" href="quick-jump.css" /><script src="haddock-bundle.min.js" async="async" type="text/javascript"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script></head><body><div id="package-header"><ul class="links" id="page-menu"><li><a href="index.html">Contents</a></li><li><a href="doc-index.html">Index</a></li></ul><p class="caption">open-adt-1.0: Open algebraic data types.</p></div><div id="content"><div id="description"><h1>open-adt-1.0: Open algebraic data types.</h1><div class="doc"><p>This library, built upon row-types, provides types and functions
+for variants of various functors that all have the same type
+applied to them. This is very similar to, and inspired by,
+<a href="https://github.com/haskus/haskus-utils">haskus-utils-variant</a>.
+At the time of writing, the compile-time performance of
+haskus-utils-variant is poor for variants with many fields, which
+should be improved in this package by using row-types.</p><p>The main types of interest in this package are <code>VarF</code> and
+<code>OpenADT</code>. <code>VarF</code> wraps a variant of functors, all over the same
+type, and provides a functor instance that fmaps over whatever
+the variant is. <code>OpenADT</code> is the fixed-point type of <code>VarF</code>,
+which allows for recursive structures to be created.</p><p>A convenience function, <code>mkVarPattern</code> from <code>TH</code>,
+generates patterns that can be used as constructors for variants.
+The key aspect of these patterns is that they are polymorphic
+in the type of the row, allowing them to be used as constructors
+for any open algebraic data type that includes a particular
+constructor.</p><p>For examples, see the <code>Tutorial</code> module.</p></div></div><div id="module-list"><p class="caption">Signatures</p></div><div id="module-list"><p class="caption">Modules</p><ul><li><span class="module details-toggle-control details-toggle" data-details-id="n.1">Data</span><details id="n.1" open="open"><summary class="hide-when-js-enabled">Submodules</summary><ul><li><span class="module"><span class="details-toggle-control details-toggle" data-details-id="n.1.1">&nbsp;</span><a href="Data-OpenADT.html">Data.OpenADT</a></span><details id="n.1.1" open="open"><summary class="hide-when-js-enabled">Submodules</summary><ul><li><span class="module"><a href="Data-OpenADT-TH.html">Data.OpenADT.TH</a></span></li><li><span class="module"><a href="Data-OpenADT-VarF.html">Data.OpenADT.VarF</a></span></li><li><span class="module"><a href="Data-OpenADT-VariantsF.html">Data.OpenADT.VariantsF</a></span></li></ul></details></li></ul></details></li></ul></div></div><div id="footer"><p>Produced by <a href="http://www.haskell.org/haddock/">Haddock</a> version 2.20.0</p></div></body></html>

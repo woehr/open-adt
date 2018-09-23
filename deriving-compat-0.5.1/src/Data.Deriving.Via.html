@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE CPP #-}</span><span>
+</span><a name="line-2"></a><span>
+</span><a name="line-3"></a><span class="hs-comment">{-|
+Module:      Data.Deriving.Via
+Copyright:   (C) 2015-2017 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Portability: Template Haskell
+
+On @template-haskell-2.12@ or later (i.e., GHC 8.2 or later), this module
+exports functionality which emulates the @GeneralizedNewtypeDeriving@ and
+@DerivingVia@ GHC extensions (the latter of which was introduced in GHC 8.6).
+
+On older versions of @template-haskell@/GHC, this module does not export
+anything.
+-}</span><span>
+</span><a name="line-17"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Deriving.Via</span><span> </span><span class="hs-special">(</span><span>
+</span><a name="line-18"></a><span class="hs-cpp">#if !(MIN_VERSION_template_haskell(2,12,0))
+</span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-20"></a><span class="hs-cpp">#else
+</span><span>    </span><span class="hs-comment">-- * @GeneralizedNewtypeDeriving@</span><span>
+</span><a name="line-22"></a><span>    </span><a href="Data.Deriving.Via.Internal.html#deriveGND"><span class="hs-identifier hs-var">deriveGND</span></a><span>
+</span><a name="line-23"></a><span>    </span><span class="hs-comment">-- * @DerivingVia@</span><span>
+</span><a name="line-24"></a><span>  </span><span class="hs-special">,</span><span> </span><a href="Data.Deriving.Via.Internal.html#deriveVia"><span class="hs-identifier hs-var">deriveVia</span></a><span>
+</span><a name="line-25"></a><span>  </span><span class="hs-special">,</span><span> </span><a href="Data.Deriving.Internal.html#Via"><span class="hs-identifier hs-type">Via</span></a><span>
+</span><a name="line-26"></a><span>    </span><span class="hs-comment">-- * Limitations</span><span>
+</span><a name="line-27"></a><span>    </span><span class="hs-comment">-- $constraints</span><span>
+</span><a name="line-28"></a><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-29"></a><span>
+</span><a name="line-30"></a><span class="hs-keyword">import</span><span> </span><a href="Data.Deriving.Internal.html"><span class="hs-identifier">Data.Deriving.Internal</span></a><span> </span><span class="hs-special">(</span><a href="Data.Deriving.Internal.html#Via"><span class="hs-identifier hs-type">Via</span></a><span class="hs-special">)</span><span>
+</span><a name="line-31"></a><span class="hs-keyword">import</span><span> </span><a href="Data.Deriving.Via.Internal.html"><span class="hs-identifier">Data.Deriving.Via.Internal</span></a><span>
+</span><a name="line-32"></a><span>
+</span><a name="line-33"></a><span class="hs-comment">{- $constraints
+
+Be aware of the following potential gotchas:
+
+* Unlike every other module in this library, the functions exported by
+  &quot;Data.Deriving.Via&quot; only support GHC 8.2 and later, as they require
+  Template Haskell functionality not present in earlier GHCs.
+
+* Additionally, using the functions in &quot;Data.Deriving.Via&quot; will likely
+  require you to enable some language extensions (besides @TemplateHaskell@).
+  These may include:
+
+    * @ImpredicativeTypes@ (if any class methods contain higher-rank types)
+
+    * @InstanceSigs@
+
+    * @KindSignatures@
+
+    * @RankNTypes@
+
+    * @ScopedTypeVariables@
+
+    * @TypeApplications@
+
+    * @UndecidableInstances@ (if deriving an instance of a type class with
+      associated type families)
+
+* The functions in &quot;Data.Deriving.Via&quot; are not terribly robust in the presence
+  of @PolyKinds@. Alas, Template Haskell does not make this easy to fix.
+
+* The functions in &quot;Data.Deriving.Via&quot; make a best-effort attempt to derive
+  instances for classes with associated type families. This is known not to
+  work in all scenarios, however, especially when the last parameter to a type
+  class appears as a kind variable in an associated type family. (See
+  &lt;https://ghc.haskell.org/trac/ghc/ticket/14728 Trac #14728&gt;.)
+-}</span><span>
+</span><a name="line-69"></a><span class="hs-cpp">#endif
+</span></pre></body></html>
