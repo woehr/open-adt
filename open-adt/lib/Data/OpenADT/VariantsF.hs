@@ -38,12 +38,16 @@ diversifyF
   -> VarF (r .\/ r') x
 diversifyF = mapVarF $ diversify @(ApplyRow x r') @(ApplyRow x r)
 
+-- | Like 'trial' but specialised for 'VarF'.
+--
+-- @since 1.0.0
 trialF
   :: (ApplyRow x r .- l ≈ ApplyRow x (r .- l), KnownSymbol l)
   => VarF r x
   -> Label l
   -> Either (ApplyRow x r .! l) (VarF (r .- l) x)
 trialF v l = (id +++ VarF) (trial (unVarF v) l)
+
 -- | Like 'multiTrial' but specialised for 'VarF'.
 --
 -- @since 1.0.0
