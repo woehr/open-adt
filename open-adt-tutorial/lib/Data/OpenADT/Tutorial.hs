@@ -1,5 +1,6 @@
 -- | Description : A short tutorial with code.
 
+{-# Language ConstraintKinds #-}
 {-# Language CPP #-}
 {-# Language DataKinds #-}
 {-# Language DeriveFunctor #-}
