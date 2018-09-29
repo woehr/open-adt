@@ -6,7 +6,8 @@ set -e
 stack haddock
 git checkout gh-pages
 # stack leaves things in these directories, so they stick around.
-rm -rf open-adt open-adt-tutorial
+rm -rf open-adt/.stack-work open-adt-tutorial/.stack-work
+rmdir open-adt open-adt-tutorial
 git rm -r ./*
 cp -r .stack-work/install/x86_64-linux-nix/lts-12.9/8.4.3/doc/* .
 git add .

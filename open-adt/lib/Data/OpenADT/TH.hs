@@ -65,14 +65,14 @@ mkVarPattern tyName rowLabel pName pfName = do
           (tvs, fmap (return . snd) argTs, n)
         NewtypeD _ _ tvs _ (NormalC n argTs) _ ->
           (tvs, fmap (return . snd) argTs, n)
-        _ -> error "Expected data declaration with one constructor or newtype"
+        _ -> error "Expected newtype or data declaration with one constructor."
 
   args <- replicateM (length conArgTs) (newName "a")
 
   let conTvs        = fmap bndrToVar conBndrs
   -- Init should not fail because the types should be functors, thus
   -- always have > 0 variables
-  let appliedTyCon = return $ foldl' AppT (ConT tyName) (init conTvs)
+  let appliedTyCon  = return $ foldl' AppT (ConT tyName) (init conTvs)
   let argsP         = fmap VarP args
   let appliedConExp = return $ foldl' AppE (ConE conName) (fmap VarE args)
   let appliedPatF   = return $ ConP patFName (fmap VarP args)
@@ -84,9 +84,10 @@ mkVarPattern tyName rowLabel pName pfName = do
   let adtR        = [t| Fix (VarF $tvR) |]
 
   let patBndrsF   = PlainTV r : conBndrs
-  let patBndrs    = PlainTV r : init conBndrs
-  let patTypeCtxF = [t| (OpenAlg $tvR $rowLabelT $appliedTyCon $tvV) |]
-  let patTypeCtx  = [t| (OpenAlg $tvR $rowLabelT $appliedTyCon $adtR) |]
+  let patBndrs    = PlainTV r : conBndrs
+  let patTypeCtxF = [t| ( OpenAlg $tvR $rowLabelT $appliedTyCon $tvV ) |]
+  let patTypeCtx  = [t| ( OpenAlg $tvR $rowLabelT $appliedTyCon $adtR
+                        , $tvV ~ $adtR ) |]
   let patRetTypeF = [t| VarF $tvR $tvV |]
   let patTypeTypeF = foldr funApp patRetTypeF conArgTs
   let patTypeType  = foldr (\x a -> do
