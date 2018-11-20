@@ -296,7 +296,7 @@ result1 = cata
 -- result2 :: List1 Int
 -- result2 = 'cata' ('Fix' . 'reduceVarF' fns) exList2
 --  where
---   fns = #cons2F .== \(Cons2F' a b x) -> Cons1F a (Cons1 b x)
+--   fns = #cons2F .== \\(Cons2F' a b x) -> Cons1F a (Cons1 b x)
 -- @
 --
 -- In the following sections we will see how to manipulate open ADT structures
@@ -326,8 +326,8 @@ result2 = cata (Fix . reduceVarF fns) exList2
 --   alg (Cons1F a x) = Cons2 a a x
 --   alg NilF = Nil
 --   alg _ = error
---     "Unfortunately using these patterns will always result in non-\\
---     \\exhaustive pattern match errors, hence the default case. :("
+--     \"Unfortunately using these patterns will always result in non-\\\\
+--     \\\\exhaustive pattern match errors, hence the default case. :(\"
 -- @
 --
 -- Unfortunately, as noted in the default case of @alg@, GHC can not (does
@@ -365,8 +365,8 @@ result3 = cata alg exList1
 -- @
 -- result4 :: List1 String
 -- result4 = 'cata' ('caseonF' r) exList1
---  where r = #nilF   .== (\NilF' -> Nil)
---         .+ #cons1F .== (\(Cons1F' a x) -> Cons1 (show @Int a) x)
+--  where r = #nilF   .== (\\NilF' -> Nil)
+--         .+ #cons1F .== (\\(Cons1F' a x) -> Cons1 (show @Int a) x)
 -- @
 
 -- | An alternative way of writing 'result3' using 'caseonF'.
@@ -501,7 +501,7 @@ result6 = fmapList (show @Int) exList2
 --     -- All others handled by fmapList'
 --     Right leftovers -> 'fmapList'' (show @Int) leftovers
 --
---   r = #cons2F .== \(Cons2F' a b x) ->
+--   r = #cons2F .== \\(Cons2F' a b x) ->
 --         Cons1 ("(" <> show a <> " : " <> show b <> ")") x
 -- @
 
