@@ -1,22 +1,22 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- | Description : A short tutorial with code.</span><span>
 </span><a name="line-2"></a><span>
-</span><a name="line-3"></a><span class="hs-pragma">{-# Language ConstraintKinds #-}</span><span>
-</span><a name="line-4"></a><span class="hs-pragma">{-# Language CPP #-}</span><span>
-</span><a name="line-5"></a><span class="hs-pragma">{-# Language DataKinds #-}</span><span>
-</span><a name="line-6"></a><span class="hs-pragma">{-# Language DeriveFunctor #-}</span><span>
-</span><a name="line-7"></a><span class="hs-pragma">{-# Language FlexibleContexts #-}</span><span>
-</span><a name="line-8"></a><span class="hs-pragma">{-# Language FlexibleInstances #-}</span><span>
-</span><a name="line-9"></a><span class="hs-pragma">{-# Language MultiParamTypeClasses #-}</span><span>
-</span><a name="line-10"></a><span class="hs-pragma">{-# Language OverloadedLabels #-}</span><span>
-</span><a name="line-11"></a><span class="hs-pragma">{-# Language PatternSynonyms #-}</span><span>
-</span><a name="line-12"></a><span class="hs-pragma">{-# Language RankNTypes #-}</span><span>
-</span><a name="line-13"></a><span class="hs-pragma">{-# Language ScopedTypeVariables #-}</span><span>
-</span><a name="line-14"></a><span class="hs-pragma">{-# Language TemplateHaskell #-}</span><span>
-</span><a name="line-15"></a><span class="hs-pragma">{-# Language TypeApplications #-}</span><span>
-</span><a name="line-16"></a><span class="hs-pragma">{-# Language TypeFamilies #-}</span><span>
-</span><a name="line-17"></a><span class="hs-pragma">{-# Language TypeOperators #-}</span><span>
-</span><a name="line-18"></a><span class="hs-pragma">{-# Language UndecidableInstances #-}</span><span>
-</span><a name="line-19"></a><span class="hs-pragma">{-# Language ViewPatterns #-}</span><span>
+</span><a name="line-3"></a><span class="hs-pragma">{-# LANGUAGE ConstraintKinds #-}</span><span>
+</span><a name="line-4"></a><span class="hs-pragma">{-# LANGUAGE CPP #-}</span><span>
+</span><a name="line-5"></a><span class="hs-pragma">{-# LANGUAGE DataKinds #-}</span><span>
+</span><a name="line-6"></a><span class="hs-pragma">{-# LANGUAGE DeriveFunctor #-}</span><span>
+</span><a name="line-7"></a><span class="hs-pragma">{-# LANGUAGE FlexibleContexts #-}</span><span>
+</span><a name="line-8"></a><span class="hs-pragma">{-# LANGUAGE FlexibleInstances #-}</span><span>
+</span><a name="line-9"></a><span class="hs-pragma">{-# LANGUAGE MultiParamTypeClasses #-}</span><span>
+</span><a name="line-10"></a><span class="hs-pragma">{-# LANGUAGE OverloadedLabels #-}</span><span>
+</span><a name="line-11"></a><span class="hs-pragma">{-# LANGUAGE PatternSynonyms #-}</span><span>
+</span><a name="line-12"></a><span class="hs-pragma">{-# LANGUAGE RankNTypes #-}</span><span>
+</span><a name="line-13"></a><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables #-}</span><span>
+</span><a name="line-14"></a><span class="hs-pragma">{-# LANGUAGE TemplateHaskell #-}</span><span>
+</span><a name="line-15"></a><span class="hs-pragma">{-# LANGUAGE TypeApplications #-}</span><span>
+</span><a name="line-16"></a><span class="hs-pragma">{-# LANGUAGE TypeFamilies #-}</span><span>
+</span><a name="line-17"></a><span class="hs-pragma">{-# LANGUAGE TypeOperators #-}</span><span>
+</span><a name="line-18"></a><span class="hs-pragma">{-# LANGUAGE UndecidableInstances #-}</span><span>
+</span><a name="line-19"></a><span class="hs-pragma">{-# LANGUAGE ViewPatterns #-}</span><span>
 </span><a name="line-20"></a><span>
 </span><a name="line-21"></a><span class="hs-pragma">{-# OPTIONS_HADDOCK show-extensions #-}</span><span>
 </span><a name="line-22"></a><span>
@@ -265,7 +265,7 @@
 </span><a name="line-265"></a><span class="hs-comment">-- @</span><span>
 </span><a name="line-266"></a><span class="hs-comment">-- result1 :: List2 Int</span><span>
 </span><a name="line-267"></a><span class="hs-comment">-- result1 = 'cata'</span><span>
-</span><a name="line-268"></a><span class="hs-comment">--   ('Fix' . 'diversifyF' @(\&quot;cons2F\&quot; .== Cons2F Int)) exList1</span><span>
+</span><a name="line-268"></a><span class="hs-comment">--   ('Fix' . 'diversifyF' \@(\&quot;cons2F\&quot; .== Cons2F Int)) exList1</span><span>
 </span><a name="line-269"></a><span class="hs-comment">-- @</span><span>
 </span><a name="line-270"></a><span>
 </span><a name="line-271"></a><span class="hs-comment">-- | The constructor 'Cons2F' is added to 'exList1' without changing its</span><span>
@@ -296,7 +296,7 @@
 </span><a name="line-296"></a><span class="hs-comment">-- result2 :: List1 Int</span><span>
 </span><a name="line-297"></a><span class="hs-comment">-- result2 = 'cata' ('Fix' . 'reduceVarF' fns) exList2</span><span>
 </span><a name="line-298"></a><span class="hs-comment">--  where</span><span>
-</span><a name="line-299"></a><span class="hs-comment">--   fns = #cons2F .== \(Cons2F' a b x) -&gt; Cons1F a (Cons1 b x)</span><span>
+</span><a name="line-299"></a><span class="hs-comment">--   fns = #cons2F .== \\(Cons2F' a b x) -&gt; Cons1F a (Cons1 b x)</span><span>
 </span><a name="line-300"></a><span class="hs-comment">-- @</span><span>
 </span><a name="line-301"></a><span class="hs-comment">--</span><span>
 </span><a name="line-302"></a><span class="hs-comment">-- In the following sections we will see how to manipulate open ADT structures</span><span>
@@ -326,8 +326,8 @@
 </span><a name="line-326"></a><span class="hs-comment">--   alg (Cons1F a x) = Cons2 a a x</span><span>
 </span><a name="line-327"></a><span class="hs-comment">--   alg NilF = Nil</span><span>
 </span><a name="line-328"></a><span class="hs-comment">--   alg _ = error</span><span>
-</span><a name="line-329"></a><span class="hs-comment">--     &quot;Unfortunately using these patterns will always result in non-\\</span><span>
-</span><a name="line-330"></a><span class="hs-comment">--     \\exhaustive pattern match errors, hence the default case. :(&quot;</span><span>
+</span><a name="line-329"></a><span class="hs-comment">--     \&quot;Unfortunately using these patterns will always result in non-\\\\</span><span>
+</span><a name="line-330"></a><span class="hs-comment">--     \\\\exhaustive pattern match errors, hence the default case. :(\&quot;</span><span>
 </span><a name="line-331"></a><span class="hs-comment">-- @</span><span>
 </span><a name="line-332"></a><span class="hs-comment">--</span><span>
 </span><a name="line-333"></a><span class="hs-comment">-- Unfortunately, as noted in the default case of @alg@, GHC can not (does</span><span>
@@ -365,8 +365,8 @@
 </span><a name="line-365"></a><span class="hs-comment">-- @</span><span>
 </span><a name="line-366"></a><span class="hs-comment">-- result4 :: List1 String</span><span>
 </span><a name="line-367"></a><span class="hs-comment">-- result4 = 'cata' ('caseonF' r) exList1</span><span>
-</span><a name="line-368"></a><span class="hs-comment">--  where r = #nilF   .== (\NilF' -&gt; Nil)</span><span>
-</span><a name="line-369"></a><span class="hs-comment">--         .+ #cons1F .== (\(Cons1F' a x) -&gt; Cons1 (show @Int a) x)</span><span>
+</span><a name="line-368"></a><span class="hs-comment">--  where r = #nilF   .== (\\NilF' -&gt; Nil)</span><span>
+</span><a name="line-369"></a><span class="hs-comment">--         .+ #cons1F .== (\\(Cons1F' a x) -&gt; Cons1 (show \@Int a) x)</span><span>
 </span><a name="line-370"></a><span class="hs-comment">-- @</span><span>
 </span><a name="line-371"></a><span>
 </span><a name="line-372"></a><span class="hs-comment">-- | An alternative way of writing 'result3' using 'caseonF'.</span><span>
@@ -408,7 +408,7 @@
 </span><a name="line-408"></a><span class="hs-comment">--   fmapList' f (Cons2F' a b x) = Cons2 (f a) (f b) x</span><span>
 </span><a name="line-409"></a><span class="hs-comment">--</span><span>
 </span><a name="line-410"></a><span class="hs-comment">-- instance (Forall v (OverList a a' r)) =&gt; OverList a a' r (VarF v) where</span><span>
-</span><a name="line-411"></a><span class="hs-comment">--   fmapList' f = varFAlg @(OverList a a' r) (fmapList' f)</span><span>
+</span><a name="line-411"></a><span class="hs-comment">--   fmapList' f = varFAlg \@(OverList a a' r) (fmapList' f)</span><span>
 </span><a name="line-412"></a><span class="hs-comment">-- @</span><span>
 </span><a name="line-413"></a><span class="hs-comment">--</span><span>
 </span><a name="line-414"></a><span class="hs-comment">-- The class 'OverList' has instances for all the constructors of 'List1' and</span><span>
@@ -493,15 +493,15 @@
 </span><a name="line-493"></a><span class="hs-comment">-- @</span><span>
 </span><a name="line-494"></a><span class="hs-comment">-- result7 = 'cata' alg exList2 where</span><span>
 </span><a name="line-495"></a><span class="hs-comment">--   alg :: Alg (List2F Int) (List1 String)</span><span>
-</span><a name="line-496"></a><span class="hs-comment">--   alg w = case 'multiTrialF' @(&quot;cons2F&quot; .== Cons2F Int) w of</span><span>
+</span><a name="line-496"></a><span class="hs-comment">--   alg w = case 'multiTrialF' \@(&quot;cons2F&quot; .== Cons2F Int) w of</span><span>
 </span><a name="line-497"></a><span class="hs-comment">--</span><span>
 </span><a name="line-498"></a><span class="hs-comment">--     -- Explicit handling of specified constructors</span><span>
 </span><a name="line-499"></a><span class="hs-comment">--     Left v -&gt; 'caseonF' r v</span><span>
 </span><a name="line-500"></a><span class="hs-comment">--</span><span>
 </span><a name="line-501"></a><span class="hs-comment">--     -- All others handled by fmapList'</span><span>
-</span><a name="line-502"></a><span class="hs-comment">--     Right leftovers -&gt; 'fmapList'' (show @Int) leftovers</span><span>
+</span><a name="line-502"></a><span class="hs-comment">--     Right leftovers -&gt; 'fmapList'' (show \@Int) leftovers</span><span>
 </span><a name="line-503"></a><span class="hs-comment">--</span><span>
-</span><a name="line-504"></a><span class="hs-comment">--   r = #cons2F .== \(Cons2F' a b x) -&gt;</span><span>
+</span><a name="line-504"></a><span class="hs-comment">--   r = #cons2F .== \\(Cons2F' a b x) -&gt;</span><span>
 </span><a name="line-505"></a><span class="hs-comment">--         Cons1 (&quot;(&quot; &lt;&gt; show a &lt;&gt; &quot; : &quot; &lt;&gt; show b &lt;&gt; &quot;)&quot;) x</span><span>
 </span><a name="line-506"></a><span class="hs-comment">-- @</span><span>
 </span><a name="line-507"></a><span>
@@ -515,7 +515,7 @@
 </span><a name="line-515"></a><span class="hs-comment">-- result7 = 'cata' alg exList2 where</span><span>
 </span><a name="line-516"></a><span class="hs-comment">--   alg w = case 'trialF' w #cons2F of</span><span>
 </span><a name="line-517"></a><span class="hs-comment">--     Left (Cons2F' a b x) -&gt; Cons1 (&quot;(&quot; &lt;&gt; show a &lt;&gt; &quot; : &quot; &lt;&gt; show b &lt;&gt; &quot;)&quot;) x</span><span>
-</span><a name="line-518"></a><span class="hs-comment">--     Right leftovers -&gt; 'fmapList'' (show @Int) leftovers</span><span>
+</span><a name="line-518"></a><span class="hs-comment">--     Right leftovers -&gt; 'fmapList'' (show \@Int) leftovers</span><span>
 </span><a name="line-519"></a><span class="hs-comment">-- @</span><span>
 </span><a name="line-520"></a><span class="hs-comment">--</span><span>
 </span><a name="line-521"></a><span class="hs-comment">-- &gt; &gt;&gt;&gt; print result7</span><span>

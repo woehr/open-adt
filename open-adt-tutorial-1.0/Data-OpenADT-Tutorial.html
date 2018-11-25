@@ -82,7 +82,7 @@ Fix (VarF (Cons1F' 0 (Fix (VarF (Cons1F' 1 (Fix (VarF NilF')))))))</pre></div></
  top-level.</p><pre>result2 :: List1 Int
 result2 = <code><a href="../recursion-schemes-5.0.3/Data-Functor-Foldable.html#v:cata" title="Data.Functor.Foldable">cata</a></code> (<code><a href="../recursion-schemes-5.0.3/Data-Functor-Foldable.html#t:Fix" title="Data.Functor.Foldable">Fix</a></code> . <code><a href="../open-adt-1.0/Data-OpenADT-VarF.html#v:reduceVarF" title="Data.OpenADT.VarF">reduceVarF</a></code> fns) exList2
  where
-  fns = #cons2F .== (Cons2F' a b x) -&gt; Cons1F a (Cons1 b x)
+  fns = #cons2F .== \(Cons2F' a b x) -&gt; Cons1F a (Cons1 b x)
 </pre><p>In the following sections we will see how to manipulate open ADT structures
  more generally.</p></div><div class="top"><p class="src"><a id="v:result2" class="def">result2</a> :: <a href="Data-OpenADT-Tutorial.html#t:List1" title="Data.OpenADT.Tutorial">List1</a> <a href="../base-4.11.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> <a href="src/Data.OpenADT.Tutorial.html#result2" class="link">Source</a> <a href="#v:result2" class="selflink">#</a></p><div class="doc"><p>Remove a constructor using <code><a href="../open-adt-1.0/Data-OpenADT-VarF.html#v:reduceVarF" title="Data.OpenADT.VarF">reduceVarF</a></code> to convert a <code><a href="Data-OpenADT-Tutorial.html#t:List2" title="Data.OpenADT.Tutorial">List2</a></code> to a <code><a href="Data-OpenADT-Tutorial.html#t:List1" title="Data.OpenADT.Tutorial">List1</a></code>.</p><pre>&gt;&gt;&gt; print result2
 Fix (VarF (Cons1F' 2 (Fix (VarF (Cons1F' 3 (Fix (VarF (Cons1F' 4 (Fix (VarF NilF'))))))))))</pre></div></div><a href="#g:9" id="g:9"><h1>Pattern Matching</h1></a><div class="doc"><p>We previously used our constructor patterns to create structures, but the
@@ -95,7 +95,7 @@ Fix (VarF (Cons1F' 2 (Fix (VarF (Cons1F' 3 (Fix (VarF (Cons1F' 4 (Fix (VarF NilF
    alg (Cons1F a x) = Cons2 a a x
    alg NilF = Nil
    alg _ = error
-     &quot;Unfortunately using these patterns will always result in non---     \exhaustive pattern match errors, hence the default case. :(&quot;</p></div><div class="top"><p class="src"><a id="v:result3" class="def">result3</a> :: <a href="Data-OpenADT-Tutorial.html#t:List2" title="Data.OpenADT.Tutorial">List2</a> <a href="../base-4.11.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> <a href="src/Data.OpenADT.Tutorial.html#result3" class="link">Source</a> <a href="#v:result3" class="selflink">#</a></p><div class="doc"><p>Use &quot;traditional&quot; pattern matching to write an algebra over a <code><a href="Data-OpenADT-Tutorial.html#t:List1" title="Data.OpenADT.Tutorial">List1</a></code>.</p><pre>&gt;&gt;&gt; print result3
+     &quot;Unfortunately using these patterns will always result in non-\--     \\exhaustive pattern match errors, hence the default case. :(&quot;</p></div><div class="top"><p class="src"><a id="v:result3" class="def">result3</a> :: <a href="Data-OpenADT-Tutorial.html#t:List2" title="Data.OpenADT.Tutorial">List2</a> <a href="../base-4.11.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> <a href="src/Data.OpenADT.Tutorial.html#result3" class="link">Source</a> <a href="#v:result3" class="selflink">#</a></p><div class="doc"><p>Use &quot;traditional&quot; pattern matching to write an algebra over a <code><a href="Data-OpenADT-Tutorial.html#t:List1" title="Data.OpenADT.Tutorial">List1</a></code>.</p><pre>&gt;&gt;&gt; print result3
 Fix (VarF (Cons2F' 0 0 (Fix (VarF (Cons2F' 1 1 (Fix (VarF NilF')))))))</pre></div></div><a href="#g:10" id="g:10"><h1>Explicit Cases</h1></a><div class="doc"><p>An alternative that does not produce incomplete pattern warnings is to use
  the <code><a href="../open-adt-1.0/Data-OpenADT-VariantsF.html#v:caseonF" title="Data.OpenADT.VariantsF">caseonF</a></code> or <code><a href="../open-adt-1.0/Data-OpenADT-VariantsF.html#v:switchF" title="Data.OpenADT.VariantsF">switchF</a></code> functions (which are versions of <code><a href="../row-types-0.2.3.0/Data-Row-Switch.html#v:caseon" title="Data.Row.Switch">caseon</a></code> and
  <code><a href="../row-types-0.2.3.0/Data-Row-Switch.html#v:switch" title="Data.Row.Switch">switch</a></code> that operate on a <code><a href="../open-adt-1.0/Data-OpenADT-VarF.html#t:VarF" title="Data.OpenADT.VarF">VarF</a></code>). Similar to <code><a href="../open-adt-1.0/Data-OpenADT-VarF.html#v:reduceVarF" title="Data.OpenADT.VarF">reduceVarF</a></code>, these functions
@@ -106,8 +106,8 @@ Fix (VarF (Cons2F' 0 0 (Fix (VarF (Cons2F' 1 1 (Fix (VarF NilF')))))))</pre></di
  type: no constructors may be omitted, nor is it possible to write any kind
  of default case.</p><pre>result4 :: List1 String
 result4 = <code><a href="../recursion-schemes-5.0.3/Data-Functor-Foldable.html#v:cata" title="Data.Functor.Foldable">cata</a></code> (<code><a href="../open-adt-1.0/Data-OpenADT-VariantsF.html#v:caseonF" title="Data.OpenADT.VariantsF">caseonF</a></code> r) exList1
- where r = #nilF   .== (NilF' -&gt; Nil)
-        .+ #cons1F .== ((Cons1F' a x) -&gt; Cons1 (show @Int a) x)
+ where r = #nilF   .== (\NilF' -&gt; Nil)
+        .+ #cons1F .== (\(Cons1F' a x) -&gt; Cons1 (show @Int a) x)
 </pre></div><div class="top"><p class="src"><a id="v:result4" class="def">result4</a> :: <a href="Data-OpenADT-Tutorial.html#t:List2" title="Data.OpenADT.Tutorial">List2</a> <a href="../base-4.11.1.0/Data-Int.html#t:Int" title="Data.Int">Int</a> <a href="src/Data.OpenADT.Tutorial.html#result4" class="link">Source</a> <a href="#v:result4" class="selflink">#</a></p><div class="doc"><p>An alternative way of writing <code><a href="Data-OpenADT-Tutorial.html#v:result3" title="Data.OpenADT.Tutorial">result3</a></code> using <code><a href="../open-adt-1.0/Data-OpenADT-VariantsF.html#v:caseonF" title="Data.OpenADT.VariantsF">caseonF</a></code>.</p><pre>&gt;&gt;&gt; print result4
 Fix (VarF (Cons2F' 0 0 (Fix (VarF (Cons2F' 1 1 (Fix (VarF NilF')))))))</pre></div></div><a href="#g:11" id="g:11"><h1>A Type Class Approach</h1></a><div class="doc"><p>An alternative approach to direct pattern matching is using type classes to
  define each case of an open ADT. The type class function can then be applied
@@ -152,15 +152,15 @@ Fix (VarF (Cons2F' &quot;2&quot; &quot;3&quot; (Fix (VarF (Cons1F' &quot;4&quot;
  variant and handle each set of constructors separately. To partition the
  ADT, we can use <code><a href="../open-adt-1.0/Data-OpenADT-VariantsF.html#v:multiTrialF" title="Data.OpenADT.VariantsF">multiTrialF</a></code> (see also <code><a href="../row-types-0.2.3.0/Data-Row-Variants.html#v:multiTrial" title="Data.Row.Variants">multiTrial</a></code>) one or more times.</p><pre>result7 = <code><a href="../recursion-schemes-5.0.3/Data-Functor-Foldable.html#v:cata" title="Data.Functor.Foldable">cata</a></code> alg exList2 where
   alg :: Alg (List2F Int) (List1 String)
-  alg w = case <code><a href="../open-adt-1.0/Data-OpenADT-VariantsF.html#v:multiTrialF" title="Data.OpenADT.VariantsF">multiTrialF</a></code> <code>(&quot;cons2F&quot; .== Cons2F Int) w of
+  alg w = case <code><a href="../open-adt-1.0/Data-OpenADT-VariantsF.html#v:multiTrialF" title="Data.OpenADT.VariantsF">multiTrialF</a></code> @(&quot;cons2F&quot; .== Cons2F Int) w of
 
     -- Explicit handling of specified constructors
     Left v -&gt; <code><a href="../open-adt-1.0/Data-OpenADT-VariantsF.html#v:caseonF" title="Data.OpenADT.VariantsF">caseonF</a></code> r v
 
     -- All others handled by fmapList'
-    Right leftovers -&gt; <code><a href="Data-OpenADT-Tutorial.html#v:fmapList-39-" title="Data.OpenADT.Tutorial">fmapList'</a></code> (show </code>Int) leftovers
+    Right leftovers -&gt; <code><a href="Data-OpenADT-Tutorial.html#v:fmapList-39-" title="Data.OpenADT.Tutorial">fmapList'</a></code> (show @Int) leftovers
 
-  r = #cons2F .== (Cons2F' a b x) -&gt;
+  r = #cons2F .== \(Cons2F' a b x) -&gt;
         Cons1 (&quot;(&quot; &lt;&gt; show a &lt;&gt; &quot; : &quot; &lt;&gt; show b &lt;&gt; &quot;)&quot;) x
 </pre></div><div class="top"><p class="src"><a id="v:result7" class="def">result7</a> :: <a href="Data-OpenADT-Tutorial.html#t:List1" title="Data.OpenADT.Tutorial">List1</a> <a href="../base-4.11.1.0/Data-String.html#t:String" title="Data.String">String</a> <a href="src/Data.OpenADT.Tutorial.html#result7" class="link">Source</a> <a href="#v:result7" class="selflink">#</a></p><div class="doc"><p>Demonstrate how to handle subsets of a <code><a href="../open-adt-1.0/Data-OpenADT-VarF.html#t:VarF" title="Data.OpenADT.VarF">VarF</a></code> individually.</p><p>Below is an alternate, but identical, implementation for the case where one
  subset of variants matched is a single variant (<code><a href="../open-adt-1.0/Data-OpenADT-VariantsF.html#v:trialF" title="Data.OpenADT.VariantsF">trialF</a></code> is used instead of
