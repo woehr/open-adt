@@ -4,6 +4,7 @@ cabal-version: >= 1.10
 category:      Data
 build-type:    Simple
 license:       BSD3
+license-file:  LICENSE
 copyright:     Copyright (c) 2018 Jordan Woehr
 maintainer:    Jordan Woehr
 homepage:      https://github.com/woehr/open-adt

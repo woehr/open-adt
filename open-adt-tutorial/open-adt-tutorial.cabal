@@ -4,6 +4,7 @@ cabal-version: >= 1.10
 category:      Data
 build-type:    Simple
 license:       BSD3
+license-file:  LICENSE
 copyright:     Copyright (c) 2018 Jordan Woehr
 maintainer:    Jordan Woehr
 homepage:      https://github.com/woehr/open-adt
@@ -41,8 +42,8 @@ library
                     -Wincomplete-record-updates
 
 executable open-adt-tutorial
-  build-depends: base              >= 4.9
-               , open-adt-tutorial >= 1
+  build-depends: open-adt-tutorial
+               , base              >= 4.9
 
   main-is:          Main.hs
 
