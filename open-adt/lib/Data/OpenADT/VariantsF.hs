@@ -9,14 +9,14 @@
 -- functions in this module are named as their row-types version with an __F__
 -- appended.
 
-{-# Language AllowAmbiguousTypes #-}
-{-# Language ConstraintKinds #-}
-{-# Language FlexibleContexts #-}
-{-# Language RankNTypes #-}
-{-# Language ScopedTypeVariables #-}
-{-# Language TypeApplications #-}
-{-# Language TypeFamilies #-}
-{-# Language TypeOperators #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Data.OpenADT.VariantsF where
 

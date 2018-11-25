@@ -1,22 +1,22 @@
 -- | Description : A short tutorial with code.
 
-{-# Language ConstraintKinds #-}
-{-# Language CPP #-}
-{-# Language DataKinds #-}
-{-# Language DeriveFunctor #-}
-{-# Language FlexibleContexts #-}
-{-# Language FlexibleInstances #-}
-{-# Language MultiParamTypeClasses #-}
-{-# Language OverloadedLabels #-}
-{-# Language PatternSynonyms #-}
-{-# Language RankNTypes #-}
-{-# Language ScopedTypeVariables #-}
-{-# Language TemplateHaskell #-}
-{-# Language TypeApplications #-}
-{-# Language TypeFamilies #-}
-{-# Language TypeOperators #-}
-{-# Language UndecidableInstances #-}
-{-# Language ViewPatterns #-}
+{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedLabels #-}
+{-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE ViewPatterns #-}
 
 {-# OPTIONS_HADDOCK show-extensions #-}
 
@@ -265,7 +265,7 @@ exList2 = Cons2 2 3 (Cons1 4 Nil)
 -- @
 -- result1 :: List2 Int
 -- result1 = 'cata'
---   ('Fix' . 'diversifyF' @(\"cons2F\" .== Cons2F Int)) exList1
+--   ('Fix' . 'diversifyF' \@(\"cons2F\" .== Cons2F Int)) exList1
 -- @
 
 -- | The constructor 'Cons2F' is added to 'exList1' without changing its
@@ -366,7 +366,7 @@ result3 = cata alg exList1
 -- result4 :: List1 String
 -- result4 = 'cata' ('caseonF' r) exList1
 --  where r = #nilF   .== (\\NilF' -> Nil)
---         .+ #cons1F .== (\\(Cons1F' a x) -> Cons1 (show @Int a) x)
+--         .+ #cons1F .== (\\(Cons1F' a x) -> Cons1 (show \@Int a) x)
 -- @
 
 -- | An alternative way of writing 'result3' using 'caseonF'.
@@ -408,7 +408,7 @@ result4 = cata (caseonF r) exList1
 --   fmapList' f (Cons2F' a b x) = Cons2 (f a) (f b) x
 --
 -- instance (Forall v (OverList a a' r)) => OverList a a' r (VarF v) where
---   fmapList' f = varFAlg @(OverList a a' r) (fmapList' f)
+--   fmapList' f = varFAlg \@(OverList a a' r) (fmapList' f)
 -- @
 --
 -- The class 'OverList' has instances for all the constructors of 'List1' and
@@ -493,13 +493,13 @@ result6 = fmapList (show @Int) exList2
 -- @
 -- result7 = 'cata' alg exList2 where
 --   alg :: Alg (List2F Int) (List1 String)
---   alg w = case 'multiTrialF' @("cons2F" .== Cons2F Int) w of
+--   alg w = case 'multiTrialF' \@("cons2F" .== Cons2F Int) w of
 --
 --     -- Explicit handling of specified constructors
 --     Left v -> 'caseonF' r v
 --
 --     -- All others handled by fmapList'
---     Right leftovers -> 'fmapList'' (show @Int) leftovers
+--     Right leftovers -> 'fmapList'' (show \@Int) leftovers
 --
 --   r = #cons2F .== \\(Cons2F' a b x) ->
 --         Cons1 ("(" <> show a <> " : " <> show b <> ")") x
@@ -515,7 +515,7 @@ result6 = fmapList (show @Int) exList2
 -- result7 = 'cata' alg exList2 where
 --   alg w = case 'trialF' w #cons2F of
 --     Left (Cons2F' a b x) -> Cons1 ("(" <> show a <> " : " <> show b <> ")") x
---     Right leftovers -> 'fmapList'' (show @Int) leftovers
+--     Right leftovers -> 'fmapList'' (show \@Int) leftovers
 -- @
 --
 -- > >>> print result7

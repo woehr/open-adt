@@ -8,9 +8,9 @@
 -- This module exports template haskell functions for generating tedious
 -- boilerplate.
 
-{-# Language PatternSynonyms #-}
-{-# Language TemplateHaskell #-}
-{-# Language ViewPatterns #-}
+{-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Data.OpenADT.TH
   ( mkVarPattern

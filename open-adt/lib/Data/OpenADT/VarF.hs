@@ -10,20 +10,20 @@
 -- to them. Most often this will be a variant constructed with a row of
 -- functors.
 
-{-# Language AllowAmbiguousTypes #-}
-{-# Language ConstraintKinds #-}
-{-# Language DataKinds #-}
-{-# Language FlexibleContexts #-}
-{-# Language FlexibleInstances #-}
-{-# Language InstanceSigs #-}
-{-# Language KindSignatures #-}
-{-# Language RankNTypes #-}
-{-# Language ScopedTypeVariables #-}
-{-# Language StandaloneDeriving #-}
-{-# Language TypeApplications #-}
-{-# Language TypeFamilies #-}
-{-# Language TypeOperators #-}
-{-# Language UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Data.OpenADT.VarF where
 

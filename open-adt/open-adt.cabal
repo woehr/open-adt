@@ -36,18 +36,17 @@ description:   This library, built upon row-types, provides types and functions
 
 tested-with:   GHC == 8.2.1, GHC == 8.2.2,
                GHC == 8.4.1, GHC == 8.4.2, GHC == 8.4.3
---               GHC == 8.6.1
 
 source-repository head
   type:     git
   location: https://github.com/woehr/open-adt
 
 library
-  build-depends: base              >= 4.9
-               , constraints       >= 0.8
-               , recursion-schemes >= 5
-               , row-types         >= 0.2.3
-               , template-haskell  >= 2.12
+  build-depends: base              >= 4.9   && < 5
+               , constraints       >= 0.8   && < 1
+               , recursion-schemes >= 5     && < 6
+               , row-types         >= 0.2.3 && < 1
+               , template-haskell  >= 2.12  && < 3
 
   exposed-modules:  Data.OpenADT
                     Data.OpenADT.TH
