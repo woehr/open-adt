@@ -15,7 +15,7 @@ let
       }:
       mkDerivation {
         pname = "open-adt-tutorial";
-        version = "1.0";
+        version = "1.1";
         src = ./.;
         isLibrary = true;
         isExecutable = true;

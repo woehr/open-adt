@@ -6,7 +6,7 @@ Open algebraic data types. Reuse constructors in different types; add and
 remove constructors from values.
 
 # Examples
-See [the tutorial module](https://woehr.github.io/open-adt/open-adt-tutorial-1.0/Data-OpenADT-Tutorial.html).
+See [the tutorial module](https://woehr.github.io/open-adt/open-adt-tutorial-1.1/Data-OpenADT-Tutorial.html).
 
 # Documentation
 Up to date documentation is always available on the [gh-pages site](https://woehr.github.io/open-adt).

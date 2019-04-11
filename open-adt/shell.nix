@@ -9,7 +9,7 @@ let
       }:
       mkDerivation {
         pname = "open-adt";
-        version = "1.0";
+        version = "1.1";
         src = ./.;
         libraryHaskellDepends = [
           base constraints recursion-schemes row-types template-haskell
