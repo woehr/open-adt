@@ -10,6 +10,7 @@
 @version 1.0
 
 
+-- | Description : A short tutorial with code.
 module Data.OpenADT.Tutorial
 
 -- | A type alias to reduce typing when writing the types of algebras.
@@ -32,7 +33,7 @@ type List1RowF a = ("nilF" .== NilF .+ "cons1F" .== Cons1F a)
 
 -- | The row of the second list type. This type re-uses the constructors of
 --   <a>List1RowF</a> and includes a third constructor: a two element cons.
-type List2RowF a = ("nilF" .== NilF .+ "cons1F" .== Cons1F a .+ "cons2F" .== Cons2F a)
+type List2RowF a = List1RowF a .+ ("cons2F" .== Cons2F a)
 
 -- | The base functor of the <a>List1</a> type. It is a <a>VarF</a> with
 --   the row <a>List1RowF</a>.
@@ -164,15 +165,21 @@ instance Data.Row.Internal.Forall v (Data.OpenADT.Tutorial.OverList a a' r) => D
 instance GHC.Show.Show a => Data.Functor.Classes.Show1 (Data.OpenADT.Tutorial.Cons2F a)
 instance GHC.Show.Show a => Data.Functor.Classes.Show1 (Data.OpenADT.Tutorial.Cons1F a)
 instance Data.Functor.Classes.Show1 Data.OpenADT.Tutorial.NilF
+instance GHC.Classes.Ord a => Data.Functor.Classes.Ord1 (Data.OpenADT.Tutorial.Cons2F a)
+instance GHC.Classes.Ord a => Data.Functor.Classes.Ord1 (Data.OpenADT.Tutorial.Cons1F a)
+instance Data.Functor.Classes.Ord1 Data.OpenADT.Tutorial.NilF
 instance GHC.Classes.Eq a => Data.Functor.Classes.Eq1 (Data.OpenADT.Tutorial.Cons2F a)
 instance GHC.Classes.Eq a => Data.Functor.Classes.Eq1 (Data.OpenADT.Tutorial.Cons1F a)
 instance Data.Functor.Classes.Eq1 Data.OpenADT.Tutorial.NilF
 instance (GHC.Show.Show a, GHC.Show.Show x) => GHC.Show.Show (Data.OpenADT.Tutorial.Cons2F a x)
+instance (GHC.Classes.Ord a, GHC.Classes.Ord x) => GHC.Classes.Ord (Data.OpenADT.Tutorial.Cons2F a x)
 instance GHC.Base.Functor (Data.OpenADT.Tutorial.Cons2F a)
 instance (GHC.Classes.Eq a, GHC.Classes.Eq x) => GHC.Classes.Eq (Data.OpenADT.Tutorial.Cons2F a x)
 instance (GHC.Show.Show a, GHC.Show.Show x) => GHC.Show.Show (Data.OpenADT.Tutorial.Cons1F a x)
+instance (GHC.Classes.Ord a, GHC.Classes.Ord x) => GHC.Classes.Ord (Data.OpenADT.Tutorial.Cons1F a x)
 instance GHC.Base.Functor (Data.OpenADT.Tutorial.Cons1F a)
 instance (GHC.Classes.Eq a, GHC.Classes.Eq x) => GHC.Classes.Eq (Data.OpenADT.Tutorial.Cons1F a x)
 instance GHC.Show.Show (Data.OpenADT.Tutorial.NilF x)
+instance GHC.Classes.Ord (Data.OpenADT.Tutorial.NilF x)
 instance GHC.Base.Functor Data.OpenADT.Tutorial.NilF
 instance GHC.Classes.Eq (Data.OpenADT.Tutorial.NilF x)

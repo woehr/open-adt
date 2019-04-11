@@ -93,9 +93,11 @@ reduceVarF :: forall r s t x r' s' t'. (t ≈ r .\\ s, r' ~ ApplyRow x r, s' ~ A
 --   constraint in the synonym, making it easy to remember.
 type OpenAlg r l f v = (ApplyRow v r .! l ≈ f v, AllUniqueLabels (ApplyRow v r))
 instance Data.Row.Internal.Forall (Data.OpenADT.VarF.ApplyRow x r) GHC.Classes.Eq => GHC.Classes.Eq (Data.OpenADT.VarF.VarF r x)
+instance (Data.Row.Internal.Forall (Data.OpenADT.VarF.ApplyRow x r) GHC.Classes.Eq, Data.Row.Internal.Forall (Data.OpenADT.VarF.ApplyRow x r) GHC.Classes.Ord) => GHC.Classes.Ord (Data.OpenADT.VarF.VarF r x)
 instance Data.Row.Internal.Forall (Data.OpenADT.VarF.ApplyRow x r) GHC.Show.Show => GHC.Show.Show (Data.OpenADT.VarF.VarF r x)
 instance Data.Row.Internal.Forall r GHC.Base.Functor => GHC.Base.Functor (Data.OpenADT.VarF.VarF r)
 instance Data.Row.Internal.Forall r Data.Functor.Classes.Eq1 => Data.Functor.Classes.Eq1 (Data.OpenADT.VarF.VarF r)
+instance (Data.Row.Internal.Forall r Data.Functor.Classes.Eq1, Data.Row.Internal.Forall r Data.Functor.Classes.Ord1) => Data.Functor.Classes.Ord1 (Data.OpenADT.VarF.VarF r)
 instance Data.Row.Internal.Forall r Data.Functor.Classes.Show1 => Data.Functor.Classes.Show1 (Data.OpenADT.VarF.VarF r)
 
 

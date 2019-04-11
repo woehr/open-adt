@@ -1,0 +1,600 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><a name="line-2"></a><span class="hs-comment">-- Module      : Data.OpenADT.Tutorial</span><span>
+</span><a name="line-3"></a><span class="hs-comment">-- Copyright   : Copyright (c) Jordan Woehr, 2018-2019</span><span>
+</span><a name="line-4"></a><span class="hs-comment">-- License     : BSD</span><span>
+</span><a name="line-5"></a><span class="hs-comment">-- Maintainer  : Jordan Woehr</span><span>
+</span><a name="line-6"></a><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><a name="line-7"></a><span class="hs-comment">--</span><span>
+</span><a name="line-8"></a><span class="hs-comment">-- Description : A short tutorial with code.</span><span>
+</span><a name="line-9"></a><span>
+</span><a name="line-10"></a><span class="hs-pragma">{-# LANGUAGE ConstraintKinds #-}</span><span>
+</span><a name="line-11"></a><span class="hs-pragma">{-# LANGUAGE CPP #-}</span><span>
+</span><a name="line-12"></a><span class="hs-pragma">{-# LANGUAGE DataKinds #-}</span><span>
+</span><a name="line-13"></a><span class="hs-pragma">{-# LANGUAGE DeriveFunctor #-}</span><span>
+</span><a name="line-14"></a><span class="hs-pragma">{-# LANGUAGE FlexibleContexts #-}</span><span>
+</span><a name="line-15"></a><span class="hs-pragma">{-# LANGUAGE FlexibleInstances #-}</span><span>
+</span><a name="line-16"></a><span class="hs-pragma">{-# LANGUAGE MultiParamTypeClasses #-}</span><span>
+</span><a name="line-17"></a><span class="hs-pragma">{-# LANGUAGE OverloadedLabels #-}</span><span>
+</span><a name="line-18"></a><span class="hs-pragma">{-# LANGUAGE PatternSynonyms #-}</span><span>
+</span><a name="line-19"></a><span class="hs-pragma">{-# LANGUAGE RankNTypes #-}</span><span>
+</span><a name="line-20"></a><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables #-}</span><span>
+</span><a name="line-21"></a><span class="hs-pragma">{-# LANGUAGE TemplateHaskell #-}</span><span>
+</span><a name="line-22"></a><span class="hs-pragma">{-# LANGUAGE TypeApplications #-}</span><span>
+</span><a name="line-23"></a><span class="hs-pragma">{-# LANGUAGE TypeFamilies #-}</span><span>
+</span><a name="line-24"></a><span class="hs-pragma">{-# LANGUAGE TypeOperators #-}</span><span>
+</span><a name="line-25"></a><span class="hs-pragma">{-# LANGUAGE UndecidableInstances #-}</span><span>
+</span><a name="line-26"></a><span class="hs-pragma">{-# LANGUAGE ViewPatterns #-}</span><span>
+</span><a name="line-27"></a><span>
+</span><a name="line-28"></a><span class="hs-pragma">{-# OPTIONS_HADDOCK show-extensions #-}</span><span>
+</span><a name="line-29"></a><span>
+</span><a name="line-30"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.OpenADT.Tutorial</span><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-31"></a><span>
+</span><a name="line-32"></a><span class="hs-keyword">import</span><span>           </span><span class="hs-identifier">Data.OpenADT</span><span>
+</span><a name="line-33"></a><span>
+</span><a name="line-34"></a><span class="hs-cpp">#if !(MIN_VERSION_base(4,11,0))
+</span><span class="hs-keyword">import</span><span>           </span><span class="hs-identifier">Data.Semigroup</span><span>                           </span><span class="hs-special">(</span><span> </span><span class="hs-special">(</span><span class="hs-operator">&lt;&gt;</span><span class="hs-special">)</span><span> </span><span class="hs-special">)</span><span>
+</span><a name="line-36"></a><span class="hs-cpp">#endif
+</span><span>
+</span><a name="line-38"></a><span class="hs-comment">-- row-types</span><span>
+</span><a name="line-39"></a><span class="hs-keyword">import</span><span>           </span><span class="hs-identifier">Data.Row</span><span>
+</span><a name="line-40"></a><span class="hs-keyword">import</span><span>           </span><span class="hs-identifier">Data.Row.Variants</span><span>
+</span><a name="line-41"></a><span>
+</span><a name="line-42"></a><span class="hs-comment">-- recursion-schemes</span><span>
+</span><a name="line-43"></a><span class="hs-keyword">import</span><span>           </span><span class="hs-identifier">Data.Functor.Foldable</span><span>                    </span><span class="hs-special">(</span><span> </span><span class="hs-identifier hs-type">Fix</span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><a name="line-44"></a><span>                                                          </span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-var">cata</span><span>
+</span><a name="line-45"></a><span>                                                          </span><span class="hs-special">)</span><span>
+</span><a name="line-46"></a><span>
+</span><a name="line-47"></a><span class="hs-comment">-- deriving-compat</span><span>
+</span><a name="line-48"></a><span class="hs-keyword">import</span><span>           </span><span class="hs-identifier">Data.Eq.Deriving</span><span>
+</span><a name="line-49"></a><span class="hs-keyword">import</span><span>           </span><span class="hs-identifier">Data.Ord.Deriving</span><span>
+</span><a name="line-50"></a><span class="hs-keyword">import</span><span>           </span><span class="hs-identifier">Text.Show.Deriving</span><span>
+</span><a name="line-51"></a><span>
+</span><a name="line-52"></a><span class="hs-comment">-- * Introduction</span><span>
+</span><a name="line-53"></a><span class="hs-comment">--</span><span>
+</span><a name="line-54"></a><span class="hs-comment">-- $introduction</span><span>
+</span><a name="line-55"></a><span class="hs-comment">-- This module demonstrates how to create open algebraic data types (ADT), and</span><span>
+</span><a name="line-56"></a><span class="hs-comment">-- is intended to be read top-to-bottom. Throughout this tutorial, we will</span><span>
+</span><a name="line-57"></a><span class="hs-comment">-- create two different list types, 'List1' and 'List2', that share two of</span><span>
+</span><a name="line-58"></a><span class="hs-comment">-- their constructors. We will also see various ways that our structures can be</span><span>
+</span><a name="line-59"></a><span class="hs-comment">-- traversed and modified.</span><span>
+</span><a name="line-60"></a><span class="hs-comment">--</span><span>
+</span><a name="line-61"></a><span class="hs-comment">-- Note that several extensions are used, which should show up in the Haddock</span><span>
+</span><a name="line-62"></a><span class="hs-comment">-- generated documentation. In particular, I recommend being familiar with</span><span>
+</span><a name="line-63"></a><span class="hs-comment">-- OverloadedLabels and TypeApplications, otherwise some syntax may be</span><span>
+</span><a name="line-64"></a><span class="hs-comment">-- confusing.</span><span>
+</span><a name="line-65"></a><span>
+</span><a name="line-66"></a><span class="hs-comment">-- | A type alias to reduce typing when writing the types of algebras.</span><span>
+</span><a name="line-67"></a><span class="hs-keyword">type</span><span> </span><a name="Alg"><a href="Data.OpenADT.Tutorial.html#Alg"><span class="hs-identifier">Alg</span></a></a><span> </span><a name="local-6989586621679055462"><a href="#local-6989586621679055462"><span class="hs-identifier">f</span></a></a><span> </span><a name="local-6989586621679055463"><a href="#local-6989586621679055463"><span class="hs-identifier">x</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a href="#local-6989586621679055462"><span class="hs-identifier hs-type">f</span></a><span> </span><a href="#local-6989586621679055463"><span class="hs-identifier hs-type">x</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679055463"><span class="hs-identifier hs-type">x</span></a><span>
+</span><a name="line-68"></a><span>
+</span><a name="line-69"></a><span class="hs-comment">-- * Constructors</span><span>
+</span><a name="line-70"></a><span class="hs-comment">--</span><span>
+</span><a name="line-71"></a><span class="hs-comment">-- $constructors</span><span>
+</span><a name="line-72"></a><span class="hs-comment">-- The first step is to create data types that correspond to the constructors</span><span>
+</span><a name="line-73"></a><span class="hs-comment">-- of the types we want. We create three different types corresponding to</span><span>
+</span><a name="line-74"></a><span class="hs-comment">-- three list constructors: 'NilF', 'Cons1F', 'Cons2F'.</span><span>
+</span><a name="line-75"></a><span class="hs-comment">--</span><span>
+</span><a name="line-76"></a><span class="hs-comment">-- For example, a two elements cons, 'Cons2F', is defined as:</span><span>
+</span><a name="line-77"></a><span class="hs-comment">--</span><span>
+</span><a name="line-78"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-79"></a><span class="hs-comment">-- -- | A two element cons element.</span><span>
+</span><a name="line-80"></a><span class="hs-comment">-- data Cons2F a x = Cons2F' a a x</span><span>
+</span><a name="line-81"></a><span class="hs-comment">--   deriving (Eq, Functor, Show)</span><span>
+</span><a name="line-82"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-83"></a><span class="hs-comment">--</span><span>
+</span><a name="line-84"></a><span class="hs-comment">-- Note that the recursion of the structure is expressed in the type variable</span><span>
+</span><a name="line-85"></a><span class="hs-comment">-- @x@ rather than explicitly. The constructor should also be a functor.</span><span>
+</span><a name="line-86"></a><span class="hs-comment">--</span><span>
+</span><a name="line-87"></a><span class="hs-comment">-- For convenience we can use 'deriveShow1' from &quot;Text.Show.Deriving&quot; to derive</span><span>
+</span><a name="line-88"></a><span class="hs-comment">-- 'Show1' instances (and 'deriveEq1' from &quot;Data.Eq.Deriving&quot; for 'Eq1' if</span><span>
+</span><a name="line-89"></a><span class="hs-comment">-- desired).</span><span>
+</span><a name="line-90"></a><span class="hs-comment">--</span><span>
+</span><a name="line-91"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-92"></a><span class="hs-comment">-- 'deriveShow1' ''Cons2F</span><span>
+</span><a name="line-93"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-94"></a><span>
+</span><a name="line-95"></a><span class="hs-comment">-- | The base case of a list type.</span><span>
+</span><a name="line-96"></a><span class="hs-keyword">data</span><span> </span><a name="NilF"><a href="Data.OpenADT.Tutorial.html#NilF"><span class="hs-identifier">NilF</span></a></a><span> </span><a name="local-6989586621679055461"><a href="#local-6989586621679055461"><span class="hs-identifier">x</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a name="NilF%27"><a href="Data.OpenADT.Tutorial.html#NilF%27"><span class="hs-identifier">NilF'</span></a></a><span>
+</span><a name="line-97"></a><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Eq</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Functor</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Ord</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Show</span><span class="hs-special">)</span><span>
+</span><a name="line-98"></a><span>
+</span><a name="line-99"></a><span class="hs-comment">-- | A one element cons element.</span><span>
+</span><a name="line-100"></a><span class="hs-keyword">data</span><span> </span><a name="Cons1F"><a href="Data.OpenADT.Tutorial.html#Cons1F"><span class="hs-identifier">Cons1F</span></a></a><span> </span><a name="local-6989586621679055459"><a href="#local-6989586621679055459"><span class="hs-identifier">a</span></a></a><span> </span><a name="local-6989586621679055460"><a href="#local-6989586621679055460"><span class="hs-identifier">x</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a name="Cons1F%27"><a href="Data.OpenADT.Tutorial.html#Cons1F%27"><span class="hs-identifier">Cons1F'</span></a></a><span> </span><a href="#local-6989586621679055459"><span class="hs-identifier hs-type">a</span></a><span> </span><a href="#local-6989586621679055460"><span class="hs-identifier hs-type">x</span></a><span>
+</span><a name="line-101"></a><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Eq</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Functor</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Ord</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Show</span><span class="hs-special">)</span><span>
+</span><a name="line-102"></a><span>
+</span><a name="line-103"></a><span class="hs-comment">-- | A two element cons element.</span><span>
+</span><a name="line-104"></a><span class="hs-keyword">data</span><span> </span><a name="Cons2F"><a href="Data.OpenADT.Tutorial.html#Cons2F"><span class="hs-identifier">Cons2F</span></a></a><span> </span><a name="local-6989586621679050773"><a href="#local-6989586621679050773"><span class="hs-identifier">a</span></a></a><span> </span><a name="local-6989586621679050774"><a href="#local-6989586621679050774"><span class="hs-identifier">x</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a name="Cons2F%27"><a href="Data.OpenADT.Tutorial.html#Cons2F%27"><span class="hs-identifier">Cons2F'</span></a></a><span> </span><a href="#local-6989586621679050773"><span class="hs-identifier hs-type">a</span></a><span> </span><a href="#local-6989586621679050773"><span class="hs-identifier hs-type">a</span></a><span> </span><a href="#local-6989586621679050774"><span class="hs-identifier hs-type">x</span></a><span>
+</span><a name="line-105"></a><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Eq</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Functor</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Ord</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Show</span><span class="hs-special">)</span><span>
+</span><a name="line-106"></a><span>
+</span><a name="line-107"></a><span class="hs-identifier hs-var">deriveEq1</span><span> </span><span class="hs-special">''</span><span class="hs-identifier hs-var">NilF</span><span>
+</span><a name="line-108"></a><span class="hs-identifier hs-var">deriveEq1</span><span> </span><span class="hs-special">''</span><span class="hs-identifier hs-var">Cons1F</span><span>
+</span><a name="line-109"></a><span class="hs-identifier hs-var">deriveEq1</span><span> </span><span class="hs-special">''</span><span class="hs-identifier hs-var">Cons2F</span><span>
+</span><a name="line-110"></a><span>
+</span><a name="line-111"></a><span class="hs-identifier hs-var">deriveOrd1</span><span> </span><span class="hs-special">''</span><span class="hs-identifier hs-var">NilF</span><span>
+</span><a name="line-112"></a><span class="hs-identifier hs-var">deriveOrd1</span><span> </span><span class="hs-special">''</span><span class="hs-identifier hs-var">Cons1F</span><span>
+</span><a name="line-113"></a><span class="hs-identifier hs-var">deriveOrd1</span><span> </span><span class="hs-special">''</span><span class="hs-identifier hs-var">Cons2F</span><span>
+</span><a name="line-114"></a><span>
+</span><a name="line-115"></a><span class="hs-identifier hs-var">deriveShow1</span><span> </span><span class="hs-special">''</span><span class="hs-identifier hs-var">NilF</span><span>
+</span><a name="line-116"></a><span class="hs-identifier hs-var">deriveShow1</span><span> </span><span class="hs-special">''</span><span class="hs-identifier hs-var">Cons1F</span><span>
+</span><a name="line-117"></a><span class="hs-identifier hs-var">deriveShow1</span><span> </span><span class="hs-special">''</span><span class="hs-identifier hs-var">Cons2F</span><span>
+</span><a name="line-118"></a><span>
+</span><a name="line-119"></a><span class="hs-comment">-- * Rows</span><span>
+</span><a name="line-120"></a><span class="hs-comment">--</span><span>
+</span><a name="line-121"></a><span class="hs-comment">-- $rows</span><span>
+</span><a name="line-122"></a><span class="hs-comment">-- With constructors defined, we can define type synonyms that describe how</span><span>
+</span><a name="line-123"></a><span class="hs-comment">-- constructors are combined to create an ADT. These synonyms</span><span>
+</span><a name="line-124"></a><span class="hs-comment">-- are 'Row's, which are lists of labels (given by type-level strings) with</span><span>
+</span><a name="line-125"></a><span class="hs-comment">-- corresponding types. The type operator ('.==') is used to associate a label</span><span>
+</span><a name="line-126"></a><span class="hs-comment">-- with its type, the result of which is a row; ('.+') is used to combine two</span><span>
+</span><a name="line-127"></a><span class="hs-comment">-- rows into a new row. These operators, and the 'Row' type, are defined in</span><span>
+</span><a name="line-128"></a><span class="hs-comment">-- the [row-types](https://hackage.haskell.org/package/row-types) package.</span><span>
+</span><a name="line-129"></a><span>
+</span><a name="line-130"></a><span class="hs-comment">-- | The row of the first list type. It defines a \&quot;standard\&quot; list type.</span><span>
+</span><a name="line-131"></a><span class="hs-keyword">type</span><span> </span><a name="List1RowF"><a href="Data.OpenADT.Tutorial.html#List1RowF"><span class="hs-identifier">List1RowF</span></a></a><span> </span><a name="local-6989586621679063691"><a href="#local-6989586621679063691"><span class="hs-identifier">a</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span> </span><span class="hs-string">&quot;nilF&quot;</span><span>   </span><span class="hs-operator hs-type">.==</span><span> </span><a href="Data.OpenADT.Tutorial.html#NilF"><span class="hs-identifier hs-type">NilF</span></a><span>
+</span><a name="line-132"></a><span>                  </span><span class="hs-operator">.+</span><span> </span><span class="hs-string">&quot;cons1F&quot;</span><span> </span><span class="hs-operator hs-type">.==</span><span> </span><a href="Data.OpenADT.Tutorial.html#Cons1F"><span class="hs-identifier hs-type">Cons1F</span></a><span> </span><a href="#local-6989586621679063691"><span class="hs-identifier hs-type">a</span></a><span>
+</span><a name="line-133"></a><span>                   </span><span class="hs-special">)</span><span>
+</span><a name="line-134"></a><span>
+</span><a name="line-135"></a><span class="hs-comment">-- | The row of the second list type. This type re-uses the constructors of</span><span>
+</span><a name="line-136"></a><span class="hs-comment">-- 'List1RowF' and includes a third constructor: a two element cons.</span><span>
+</span><a name="line-137"></a><span class="hs-keyword">type</span><span> </span><a name="List2RowF"><a href="Data.OpenADT.Tutorial.html#List2RowF"><span class="hs-identifier">List2RowF</span></a></a><span> </span><a name="local-6989586621679063690"><a href="#local-6989586621679063690"><span class="hs-identifier">a</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-type">List1RowF</span><span> </span><a href="#local-6989586621679063690"><span class="hs-identifier hs-type">a</span></a><span> </span><span class="hs-operator">.+</span><span> </span><span class="hs-special">(</span><span class="hs-string">&quot;cons2F&quot;</span><span> </span><span class="hs-operator hs-type">.==</span><span> </span><a href="Data.OpenADT.Tutorial.html#Cons2F"><span class="hs-identifier hs-type">Cons2F</span></a><span> </span><a href="#local-6989586621679063690"><span class="hs-identifier hs-type">a</span></a><span class="hs-special">)</span><span>
+</span><a name="line-138"></a><span>
+</span><a name="line-139"></a><span class="hs-comment">-- * Types</span><span>
+</span><a name="line-140"></a><span class="hs-comment">--</span><span>
+</span><a name="line-141"></a><span class="hs-comment">-- $types</span><span>
+</span><a name="line-142"></a><span class="hs-comment">-- The 'VarF' newtype forms the basis of an open ADT. It wraps the variant</span><span>
+</span><a name="line-143"></a><span class="hs-comment">-- whose possible values are the constructors of the ADT. Its type constructor</span><span>
+</span><a name="line-144"></a><span class="hs-comment">-- takes two parameters:</span><span>
+</span><a name="line-145"></a><span class="hs-comment">--</span><span>
+</span><a name="line-146"></a><span class="hs-comment">-- - a row of types with the kind @(* -&gt; *)@,</span><span>
+</span><a name="line-147"></a><span class="hs-comment">-- - and a type of kind @(*)@ that is applied to each element of the row.</span><span>
+</span><a name="line-148"></a><span class="hs-comment">--</span><span>
+</span><a name="line-149"></a><span class="hs-comment">-- 'VarF' has a functor instance when all the types of the row are functors.</span><span>
+</span><a name="line-150"></a><span class="hs-comment">-- Using 'VarF' we can define the base functor of our ADTs. Taking the fixpoint</span><span>
+</span><a name="line-151"></a><span class="hs-comment">-- of these functor types yields the ADT.</span><span>
+</span><a name="line-152"></a><span>
+</span><a name="line-153"></a><span class="hs-comment">-- | The base functor of the 'List1' type. It is a 'VarF' with the row</span><span>
+</span><a name="line-154"></a><span class="hs-comment">-- 'List1RowF'.</span><span>
+</span><a name="line-155"></a><span class="hs-keyword">type</span><span> </span><a name="List1F"><a href="Data.OpenADT.Tutorial.html#List1F"><span class="hs-identifier">List1F</span></a></a><span> </span><a name="local-6989586621679063689"><a href="#local-6989586621679063689"><span class="hs-identifier">a</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-type">VarF</span><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#List1RowF"><span class="hs-identifier hs-type">List1RowF</span></a><span> </span><a href="#local-6989586621679063689"><span class="hs-identifier hs-type">a</span></a><span class="hs-special">)</span><span>
+</span><a name="line-156"></a><span>
+</span><a name="line-157"></a><span class="hs-comment">-- | A list type. We obtain this type by taking the fixed point of its base</span><span>
+</span><a name="line-158"></a><span class="hs-comment">-- functor.</span><span>
+</span><a name="line-159"></a><span class="hs-keyword">type</span><span> </span><a name="List1"><a href="Data.OpenADT.Tutorial.html#List1"><span class="hs-identifier">List1</span></a></a><span>  </span><a name="local-6989586621679063688"><a href="#local-6989586621679063688"><span class="hs-identifier">a</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-type">Fix</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">VarF</span><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#List1RowF"><span class="hs-identifier hs-type">List1RowF</span></a><span> </span><a href="#local-6989586621679063688"><span class="hs-identifier hs-type">a</span></a><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><a name="line-160"></a><span>
+</span><a name="line-161"></a><span class="hs-comment">-- | The base functor of the 'List2' type.</span><span>
+</span><a name="line-162"></a><span class="hs-keyword">type</span><span> </span><a name="List2F"><a href="Data.OpenADT.Tutorial.html#List2F"><span class="hs-identifier">List2F</span></a></a><span> </span><a name="local-6989586621679063535"><a href="#local-6989586621679063535"><span class="hs-identifier">a</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-type">VarF</span><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#List2RowF"><span class="hs-identifier hs-type">List2RowF</span></a><span> </span><a href="#local-6989586621679063535"><span class="hs-identifier hs-type">a</span></a><span class="hs-special">)</span><span>
+</span><a name="line-163"></a><span>
+</span><a name="line-164"></a><span class="hs-comment">-- | A list type with a two element cons. This type is defined with the</span><span>
+</span><a name="line-165"></a><span class="hs-comment">-- 'OpenADT' synonym, which is simply conveinience for @Fix (VarF r)@.</span><span>
+</span><a name="line-166"></a><span class="hs-keyword">type</span><span> </span><a name="List2"><a href="Data.OpenADT.Tutorial.html#List2"><span class="hs-identifier">List2</span></a></a><span>  </span><a name="local-6989586621679063534"><a href="#local-6989586621679063534"><span class="hs-identifier">a</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-type">OpenADT</span><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#List2RowF"><span class="hs-identifier hs-type">List2RowF</span></a><span> </span><a href="#local-6989586621679063534"><span class="hs-identifier hs-type">a</span></a><span class="hs-special">)</span><span>
+</span><a name="line-167"></a><span>
+</span><a name="line-168"></a><span class="hs-comment">-- * Patterns</span><span>
+</span><a name="line-169"></a><span class="hs-comment">--</span><span>
+</span><a name="line-170"></a><span class="hs-comment">-- $patterns</span><span>
+</span><a name="line-171"></a><span class="hs-comment">-- In order to simplify our code, and avoid using 'VarF' directly, we can</span><span>
+</span><a name="line-172"></a><span class="hs-comment">-- define pattern synonyms for each constructor. Importantly, if written</span><span>
+</span><a name="line-173"></a><span class="hs-comment">-- generically enough, these patterns will work for a constructor regardless</span><span>
+</span><a name="line-174"></a><span class="hs-comment">-- the specific type it is used in. For example, we can write a single pattern</span><span>
+</span><a name="line-175"></a><span class="hs-comment">-- that matches the 'NilF' constructor in both the 'List1' and 'List2' types!</span><span>
+</span><a name="line-176"></a><span class="hs-comment">-- This is achieved with the pattern below:</span><span>
+</span><a name="line-177"></a><span class="hs-comment">--</span><span>
+</span><a name="line-178"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-179"></a><span class="hs-comment">-- pattern NilF :: (OpenAlg r &quot;nilF&quot; NilF x) =&gt; VarF r x</span><span>
+</span><a name="line-180"></a><span class="hs-comment">-- pattern NilF \&lt;- VarF ('view' #nilF -\&gt; Just NilF')</span><span>
+</span><a name="line-181"></a><span class="hs-comment">--   where NilF = VarF ('IsJust' #nilF NilF')</span><span>
+</span><a name="line-182"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-183"></a><span class="hs-comment">--</span><span>
+</span><a name="line-184"></a><span class="hs-comment">-- Note that in 'NilF', the variables @r@ and @x@ are left abstract. This</span><span>
+</span><a name="line-185"></a><span class="hs-comment">-- allows any row and type to be used with the pattern. In our</span><span>
+</span><a name="line-186"></a><span class="hs-comment">-- running example, @r@ could be either 'List1RowF' or 'List2RowF', while</span><span>
+</span><a name="line-187"></a><span class="hs-comment">-- @v@ could be either 'List1' or 'List2', respectively.</span><span>
+</span><a name="line-188"></a><span class="hs-comment">--</span><span>
+</span><a name="line-189"></a><span class="hs-comment">-- The pattern for the \&quot;fixed\&quot; constructor fixes the @x@ parameter to</span><span>
+</span><a name="line-190"></a><span class="hs-comment">-- @OpenADT r@ (below).</span><span>
+</span><a name="line-191"></a><span class="hs-comment">--</span><span>
+</span><a name="line-192"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-193"></a><span class="hs-comment">-- pattern Nil :: (OpenAlg r &quot;nilF&quot; NilF (OpenADT r)) =&gt; OpenADT r</span><span>
+</span><a name="line-194"></a><span class="hs-comment">-- pattern Nil = 'Fix' NilF</span><span>
+</span><a name="line-195"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-196"></a><span class="hs-comment">--</span><span>
+</span><a name="line-197"></a><span class="hs-comment">-- Since the patterns for each constructor are fairly repetative with only the</span><span>
+</span><a name="line-198"></a><span class="hs-comment">-- name changing, &quot;Data.OpenADT.TH&quot; provides a function, 'mkVarPattern', that</span><span>
+</span><a name="line-199"></a><span class="hs-comment">-- generates these patterns for you! The function takes four parameters:</span><span>
+</span><a name="line-200"></a><span class="hs-comment">--</span><span>
+</span><a name="line-201"></a><span class="hs-comment">-- 1. the type of the constructor,</span><span>
+</span><a name="line-202"></a><span class="hs-comment">-- 2. the label to be used for the constructor in the row,</span><span>
+</span><a name="line-203"></a><span class="hs-comment">-- 3. the name of the \&quot;fixed\&quot; pattern,</span><span>
+</span><a name="line-204"></a><span class="hs-comment">-- 4. and the name of the base functor pattern.</span><span>
+</span><a name="line-205"></a><span class="hs-comment">--</span><span>
+</span><a name="line-206"></a><span class="hs-comment">--</span><span>
+</span><a name="line-207"></a><span class="hs-comment">-- For example, the constructors for 'Cons1F' and 'Cons2F' can be created with:</span><span>
+</span><a name="line-208"></a><span class="hs-comment">--</span><span>
+</span><a name="line-209"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-210"></a><span class="hs-comment">-- mkVarPattern ''Cons1F \&quot;cons1F\&quot; \&quot;Cons1\&quot; \&quot;Cons1F\&quot;</span><span>
+</span><a name="line-211"></a><span class="hs-comment">-- mkVarPattern ''Cons2F \&quot;cons2F\&quot; \&quot;Cons2\&quot; \&quot;Cons2F\&quot;</span><span>
+</span><a name="line-212"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-213"></a><span>
+</span><a name="line-214"></a><span class="hs-keyword">pattern</span><span> </span><span class="hs-identifier">NilF</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">OpenAlg</span><span> </span><a href="#local-6989586621679063693"><span class="hs-identifier hs-type">r</span></a><span> </span><span class="hs-string">&quot;nilF&quot;</span><span> </span><a href="Data.OpenADT.Tutorial.html#NilF"><span class="hs-identifier hs-type">NilF</span></a><span> </span><a href="#local-6989586621679063694"><span class="hs-identifier hs-type">x</span></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-identifier hs-type">VarF</span><span> </span><a href="#local-6989586621679063693"><span class="hs-identifier hs-type">r</span></a><span> </span><a href="#local-6989586621679063694"><span class="hs-identifier hs-type">x</span></a><span>
+</span><a name="line-215"></a><span class="hs-keyword">pattern</span><span> </span><a name="NilF"><a href="Data.OpenADT.Tutorial.html#NilF"><span class="hs-identifier">NilF</span></a></a><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-identifier hs-var">VarF</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-var">view</span><span> </span><span class="">#nilF</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-var">Just</span><span> </span><a href="Data.OpenADT.Tutorial.html#NilF%27"><span class="hs-identifier hs-var">NilF'</span></a><span class="hs-special">)</span><span>
+</span><a name="line-216"></a><span>  </span><span class="hs-keyword">where</span><span> </span><span class="hs-identifier">NilF</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">VarF</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-var">IsJust</span><span> </span><span class="">#nilF</span><span> </span><a href="Data.OpenADT.Tutorial.html#NilF%27"><span class="hs-identifier hs-var">NilF'</span></a><span class="hs-special">)</span><span>
+</span><a name="line-217"></a><span>
+</span><a name="line-218"></a><span class="hs-keyword">pattern</span><span> </span><span class="hs-identifier">Nil</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">OpenAlg</span><span> </span><a href="#local-6989586621679063692"><span class="hs-identifier hs-type">r</span></a><span> </span><span class="hs-string">&quot;nilF&quot;</span><span> </span><a href="Data.OpenADT.Tutorial.html#NilF"><span class="hs-identifier hs-type">NilF</span></a><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">OpenADT</span><span> </span><a href="#local-6989586621679063692"><span class="hs-identifier hs-type">r</span></a><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-identifier hs-type">OpenADT</span><span> </span><a href="#local-6989586621679063692"><span class="hs-identifier hs-type">r</span></a><span>
+</span><a name="line-219"></a><span class="hs-keyword">pattern</span><span> </span><a name="Nil"><a href="Data.OpenADT.Tutorial.html#Nil"><span class="hs-identifier">Nil</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">Fix</span><span> </span><a href="Data.OpenADT.Tutorial.html#NilF"><span class="hs-identifier hs-var">NilF</span></a><span>
+</span><a name="line-220"></a><span>
+</span><a name="line-221"></a><span class="hs-identifier hs-var">mkVarPattern</span><span> </span><span class="hs-special">''</span><span class="hs-identifier hs-var">Cons1F</span><span> </span><span class="hs-string">&quot;cons1F&quot;</span><span> </span><span class="hs-string">&quot;Cons1&quot;</span><span> </span><span class="hs-string">&quot;Cons1F&quot;</span><span>
+</span><a name="line-222"></a><span class="hs-identifier hs-var">mkVarPattern</span><span> </span><span class="hs-special">''</span><span class="hs-identifier hs-var">Cons2F</span><span> </span><span class="hs-string">&quot;cons2F&quot;</span><span> </span><span class="hs-string">&quot;Cons2&quot;</span><span> </span><span class="hs-string">&quot;Cons2F&quot;</span><span>
+</span><a name="line-223"></a><span>
+</span><a name="line-224"></a><span class="hs-comment">-- * Constructing Values</span><span>
+</span><a name="line-225"></a><span class="hs-comment">--</span><span>
+</span><a name="line-226"></a><span class="hs-comment">-- $constructing</span><span>
+</span><a name="line-227"></a><span class="hs-comment">-- The patterns that we have written can be used to construct values as if they</span><span>
+</span><a name="line-228"></a><span class="hs-comment">-- were normal ADTs. The one caveat is that GHC cannot infer the types since</span><span>
+</span><a name="line-229"></a><span class="hs-comment">-- the variable @r@ in the patterns can be any row. This is, in practice, not</span><span>
+</span><a name="line-230"></a><span class="hs-comment">-- much of an issue as top-level type declarations are sufficient in most</span><span>
+</span><a name="line-231"></a><span class="hs-comment">-- cases.</span><span>
+</span><a name="line-232"></a><span class="hs-comment">--</span><span>
+</span><a name="line-233"></a><span class="hs-comment">-- For the remaining of this tutorial we will use the following lists in</span><span>
+</span><a name="line-234"></a><span class="hs-comment">-- examples:</span><span>
+</span><a name="line-235"></a><span class="hs-comment">--</span><span>
+</span><a name="line-236"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-237"></a><span class="hs-comment">-- exList1 :: List1 Int</span><span>
+</span><a name="line-238"></a><span class="hs-comment">-- exList1 = Cons1 0 (Cons1 1 Nil)</span><span>
+</span><a name="line-239"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-240"></a><span class="hs-comment">--</span><span>
+</span><a name="line-241"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-242"></a><span class="hs-comment">-- exList2 :: List2 Int</span><span>
+</span><a name="line-243"></a><span class="hs-comment">-- exList2 = Cons2 2 3 (Cons1 4 Nil)</span><span>
+</span><a name="line-244"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-245"></a><span>
+</span><a name="line-246"></a><span class="hs-comment">-- | Construct a 'List1'. The patterns 'Cons1' and 'Nil' are used.</span><span>
+</span><a name="line-247"></a><span class="hs-comment">--</span><span>
+</span><a name="line-248"></a><span class="hs-comment">-- &gt; &gt;&gt;&gt; print exList1</span><span>
+</span><a name="line-249"></a><span class="hs-comment">-- &gt; Fix (VarF (Cons1F' 0 (Fix (VarF (Cons1F' 1 (Fix (VarF NilF')))))))</span><span>
+</span><a name="line-250"></a><span class="hs-identifier">exList1</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="Data.OpenADT.Tutorial.html#List1"><span class="hs-identifier hs-type">List1</span></a><span> </span><span class="hs-identifier hs-type">Int</span><span>
+</span><a name="line-251"></a><a name="exList1"><a href="Data.OpenADT.Tutorial.html#exList1"><span class="hs-identifier">exList1</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a href="Data.OpenADT.Tutorial.html#Cons1"><span class="hs-identifier hs-var">Cons1</span></a><span> </span><span class="hs-number">0</span><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#Cons1"><span class="hs-identifier hs-var">Cons1</span></a><span> </span><span class="hs-number">1</span><span> </span><a href="Data.OpenADT.Tutorial.html#Nil"><span class="hs-identifier hs-var">Nil</span></a><span class="hs-special">)</span><span>
+</span><a name="line-252"></a><span>
+</span><a name="line-253"></a><span class="hs-comment">-- | Construct a 'List2'.</span><span>
+</span><a name="line-254"></a><span class="hs-comment">--</span><span>
+</span><a name="line-255"></a><span class="hs-comment">-- &gt; &gt;&gt;&gt; print exList2</span><span>
+</span><a name="line-256"></a><span class="hs-comment">-- &gt; Fix (VarF (Cons2F' 2 3 (Fix (VarF (Cons1F' 4 (Fix (VarF NilF')))))))</span><span>
+</span><a name="line-257"></a><span class="hs-identifier">exList2</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="Data.OpenADT.Tutorial.html#List2"><span class="hs-identifier hs-type">List2</span></a><span> </span><span class="hs-identifier hs-type">Int</span><span>
+</span><a name="line-258"></a><a name="exList2"><a href="Data.OpenADT.Tutorial.html#exList2"><span class="hs-identifier">exList2</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a href="Data.OpenADT.Tutorial.html#Cons2"><span class="hs-identifier hs-var">Cons2</span></a><span> </span><span class="hs-number">2</span><span> </span><span class="hs-number">3</span><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#Cons1"><span class="hs-identifier hs-var">Cons1</span></a><span> </span><span class="hs-number">4</span><span> </span><a href="Data.OpenADT.Tutorial.html#Nil"><span class="hs-identifier hs-var">Nil</span></a><span class="hs-special">)</span><span>
+</span><a name="line-259"></a><span>
+</span><a name="line-260"></a><span class="hs-comment">-- * Adding Constructors</span><span>
+</span><a name="line-261"></a><span class="hs-comment">--</span><span>
+</span><a name="line-262"></a><span class="hs-comment">-- $lifting</span><span>
+</span><a name="line-263"></a><span class="hs-comment">-- Adding constructors to an open ADT is easy. We can use 'cata' from the</span><span>
+</span><a name="line-264"></a><span class="hs-comment">-- recursion-schemes library to define a __cata__morphism (a bottom-up</span><span>
+</span><a name="line-265"></a><span class="hs-comment">-- traversal) over our ADT. At each node in our structure, we apply the</span><span>
+</span><a name="line-266"></a><span class="hs-comment">-- function 'diversifyF' (see also 'diversify'), which adds constructors to our</span><span>
+</span><a name="line-267"></a><span class="hs-comment">-- variant (without making any changes).</span><span>
+</span><a name="line-268"></a><span class="hs-comment">--</span><span>
+</span><a name="line-269"></a><span class="hs-comment">-- In the following example, a 'List1' is changed to a 'List2'. Note how the</span><span>
+</span><a name="line-270"></a><span class="hs-comment">-- type applications extension (-XTypeApplications) can be used to easily</span><span>
+</span><a name="line-271"></a><span class="hs-comment">-- specify the first type argument to 'diversifyF', which is the row the</span><span>
+</span><a name="line-272"></a><span class="hs-comment">-- variant is extended with.</span><span>
+</span><a name="line-273"></a><span class="hs-comment">--</span><span>
+</span><a name="line-274"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-275"></a><span class="hs-comment">-- result1 :: List2 Int</span><span>
+</span><a name="line-276"></a><span class="hs-comment">-- result1 = 'cata'</span><span>
+</span><a name="line-277"></a><span class="hs-comment">--   ('Fix' . 'diversifyF' \@(\&quot;cons2F\&quot; .== Cons2F Int)) exList1</span><span>
+</span><a name="line-278"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-279"></a><span>
+</span><a name="line-280"></a><span class="hs-comment">-- | The constructor 'Cons2F' is added to 'exList1' without changing its</span><span>
+</span><a name="line-281"></a><span class="hs-comment">-- structure.</span><span>
+</span><a name="line-282"></a><span class="hs-comment">--</span><span>
+</span><a name="line-283"></a><span class="hs-comment">-- &gt; &gt;&gt;&gt; print result1</span><span>
+</span><a name="line-284"></a><span class="hs-comment">-- &gt; Fix (VarF (Cons1F' 0 (Fix (VarF (Cons1F' 1 (Fix (VarF NilF')))))))</span><span>
+</span><a name="line-285"></a><span class="hs-identifier">result1</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="Data.OpenADT.Tutorial.html#List2"><span class="hs-identifier hs-type">List2</span></a><span> </span><span class="hs-identifier hs-type">Int</span><span>
+</span><a name="line-286"></a><a name="result1"><a href="Data.OpenADT.Tutorial.html#result1"><span class="hs-identifier">result1</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">cata</span><span>
+</span><a name="line-287"></a><span>  </span><span class="hs-special">(</span><span class="hs-identifier hs-var">Fix</span><span> </span><span class="hs-operator hs-var">.</span><span> </span><span class="hs-identifier hs-var">diversifyF</span><span> </span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="hs-string">&quot;cons2F&quot;</span><span> </span><span class="hs-operator hs-type">.==</span><span> </span><a href="Data.OpenADT.Tutorial.html#Cons2F"><span class="hs-identifier hs-type">Cons2F</span></a><span> </span><span class="hs-identifier hs-type">Int</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><a href="Data.OpenADT.Tutorial.html#exList1"><span class="hs-identifier hs-var">exList1</span></a><span>
+</span><a name="line-288"></a><span>
+</span><a name="line-289"></a><span class="hs-comment">-- * Removing Constructors</span><span>
+</span><a name="line-290"></a><span class="hs-comment">--</span><span>
+</span><a name="line-291"></a><span class="hs-comment">-- $restricting</span><span>
+</span><a name="line-292"></a><span class="hs-comment">-- To convert an ADT of one type to another with /fewer/ constructors, we need</span><span>
+</span><a name="line-293"></a><span class="hs-comment">-- to specify how constructors are removed should they exist in the structure.</span><span>
+</span><a name="line-294"></a><span class="hs-comment">-- The function 'reduceVarF' removes the constructors in a structure</span><span>
+</span><a name="line-295"></a><span class="hs-comment">-- corresponding to the fields of the record ('Data.Row.Records.Rec' from</span><span>
+</span><a name="line-296"></a><span class="hs-comment">-- [row-types](https://hackage.haskell.org/package/row-types)) of its</span><span>
+</span><a name="line-297"></a><span class="hs-comment">-- first argument. This function may only be used to remove constructors; it</span><span>
+</span><a name="line-298"></a><span class="hs-comment">-- can not add or modify them. More specifically, it is constrained such that</span><span>
+</span><a name="line-299"></a><span class="hs-comment">-- the set of labels of the row of the input record must be exactly the set</span><span>
+</span><a name="line-300"></a><span class="hs-comment">-- of labels of the input 'VarF' /less/ the output 'VarF'. While more</span><span>
+</span><a name="line-301"></a><span class="hs-comment">-- constrained than strictly necessary, this allows GHC to infer types better.</span><span>
+</span><a name="line-302"></a><span class="hs-comment">-- Note in the example below that there are no annotations other than at the</span><span>
+</span><a name="line-303"></a><span class="hs-comment">-- top-level.</span><span>
+</span><a name="line-304"></a><span class="hs-comment">--</span><span>
+</span><a name="line-305"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-306"></a><span class="hs-comment">-- result2 :: List1 Int</span><span>
+</span><a name="line-307"></a><span class="hs-comment">-- result2 = 'cata' ('Fix' . 'reduceVarF' fns) exList2</span><span>
+</span><a name="line-308"></a><span class="hs-comment">--  where</span><span>
+</span><a name="line-309"></a><span class="hs-comment">--   fns = #cons2F .== \\(Cons2F' a b x) -&gt; Cons1F a (Cons1 b x)</span><span>
+</span><a name="line-310"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-311"></a><span class="hs-comment">--</span><span>
+</span><a name="line-312"></a><span class="hs-comment">-- In the following sections we will see how to manipulate open ADT structures</span><span>
+</span><a name="line-313"></a><span class="hs-comment">-- more generally.</span><span>
+</span><a name="line-314"></a><span>
+</span><a name="line-315"></a><span class="hs-comment">-- | Remove a constructor using 'reduceVarF' to convert a 'List2' to a 'List1'.</span><span>
+</span><a name="line-316"></a><span class="hs-comment">--</span><span>
+</span><a name="line-317"></a><span class="hs-comment">-- &gt; &gt;&gt;&gt; print result2</span><span>
+</span><a name="line-318"></a><span class="hs-comment">-- &gt; Fix (VarF (Cons1F' 2 (Fix (VarF (Cons1F' 3 (Fix (VarF (Cons1F' 4 (Fix (VarF NilF'))))))))))</span><span>
+</span><a name="line-319"></a><span class="hs-identifier">result2</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="Data.OpenADT.Tutorial.html#List1"><span class="hs-identifier hs-type">List1</span></a><span> </span><span class="hs-identifier hs-type">Int</span><span>
+</span><a name="line-320"></a><a name="result2"><a href="Data.OpenADT.Tutorial.html#result2"><span class="hs-identifier">result2</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">cata</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-var">Fix</span><span> </span><span class="hs-operator hs-var">.</span><span> </span><span class="hs-identifier hs-var">reduceVarF</span><span> </span><a href="#local-6989586621679064663"><span class="hs-identifier hs-var">fns</span></a><span class="hs-special">)</span><span> </span><a href="Data.OpenADT.Tutorial.html#exList2"><span class="hs-identifier hs-var">exList2</span></a><span>
+</span><a name="line-321"></a><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-322"></a><span>  </span><a name="local-6989586621679064663"><a href="#local-6989586621679064663"><span class="hs-identifier">fns</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="">#cons2F</span><span> </span><span class="hs-operator hs-var">.==</span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#Cons2F%27"><span class="hs-identifier hs-var">Cons2F'</span></a><span> </span><a name="local-6989586621679064664"><a href="#local-6989586621679064664"><span class="hs-identifier">a</span></a></a><span> </span><a name="local-6989586621679064665"><a href="#local-6989586621679064665"><span class="hs-identifier">b</span></a></a><span> </span><a name="local-6989586621679064666"><a href="#local-6989586621679064666"><span class="hs-identifier">x</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="Data.OpenADT.Tutorial.html#Cons1F"><span class="hs-identifier hs-var">Cons1F</span></a><span> </span><a href="#local-6989586621679064664"><span class="hs-identifier hs-var">a</span></a><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#Cons1"><span class="hs-identifier hs-var">Cons1</span></a><span> </span><a href="#local-6989586621679064665"><span class="hs-identifier hs-var">b</span></a><span> </span><a href="#local-6989586621679064666"><span class="hs-identifier hs-var">x</span></a><span class="hs-special">)</span><span>
+</span><a name="line-323"></a><span>
+</span><a name="line-324"></a><span class="hs-comment">-- * Pattern Matching</span><span>
+</span><a name="line-325"></a><span class="hs-comment">--</span><span>
+</span><a name="line-326"></a><span class="hs-comment">-- $matching</span><span>
+</span><a name="line-327"></a><span class="hs-comment">-- We previously used our constructor patterns to create structures, but the</span><span>
+</span><a name="line-328"></a><span class="hs-comment">-- patterns are bidirectional, so we can just as easily match with them. For</span><span>
+</span><a name="line-329"></a><span class="hs-comment">-- example, we can write a standard recursion scheme.</span><span>
+</span><a name="line-330"></a><span class="hs-comment">--</span><span>
+</span><a name="line-331"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-332"></a><span class="hs-comment">-- result3 :: List2 Int</span><span>
+</span><a name="line-333"></a><span class="hs-comment">-- result3 = 'cata' alg exList1</span><span>
+</span><a name="line-334"></a><span class="hs-comment">--  where</span><span>
+</span><a name="line-335"></a><span class="hs-comment">--   alg :: Alg (List1F Int) (List2 Int)</span><span>
+</span><a name="line-336"></a><span class="hs-comment">--   alg (Cons1F a x) = Cons2 a a x</span><span>
+</span><a name="line-337"></a><span class="hs-comment">--   alg NilF = Nil</span><span>
+</span><a name="line-338"></a><span class="hs-comment">--   alg _ = error</span><span>
+</span><a name="line-339"></a><span class="hs-comment">--     \&quot;Unfortunately using these patterns will always result in non-\\\\</span><span>
+</span><a name="line-340"></a><span class="hs-comment">--     \\\\exhaustive pattern match errors, hence the default case. :(\&quot;</span><span>
+</span><a name="line-341"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-342"></a><span class="hs-comment">--</span><span>
+</span><a name="line-343"></a><span class="hs-comment">-- Unfortunately, as noted in the default case of @alg@, GHC can not (does</span><span>
+</span><a name="line-344"></a><span class="hs-comment">-- not?) check the exhaustiveness of pattern synonyms. Using a default case</span><span>
+</span><a name="line-345"></a><span class="hs-comment">-- will get rid of non-exhaustiveness warnings, but could also hide bugs if it</span><span>
+</span><a name="line-346"></a><span class="hs-comment">-- is partial.</span><span>
+</span><a name="line-347"></a><span>
+</span><a name="line-348"></a><span class="hs-comment">-- | Use \&quot;traditional\&quot; pattern matching to write an algebra over a 'List1'.</span><span>
+</span><a name="line-349"></a><span class="hs-comment">--</span><span>
+</span><a name="line-350"></a><span class="hs-comment">-- &gt; &gt;&gt;&gt; print result3</span><span>
+</span><a name="line-351"></a><span class="hs-comment">-- &gt; Fix (VarF (Cons2F' 0 0 (Fix (VarF (Cons2F' 1 1 (Fix (VarF NilF')))))))</span><span>
+</span><a name="line-352"></a><span class="hs-identifier">result3</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="Data.OpenADT.Tutorial.html#List2"><span class="hs-identifier hs-type">List2</span></a><span> </span><span class="hs-identifier hs-type">Int</span><span>
+</span><a name="line-353"></a><a name="result3"><a href="Data.OpenADT.Tutorial.html#result3"><span class="hs-identifier">result3</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">cata</span><span> </span><a href="#local-6989586621679065077"><span class="hs-identifier hs-var">alg</span></a><span> </span><a href="Data.OpenADT.Tutorial.html#exList1"><span class="hs-identifier hs-var">exList1</span></a><span>
+</span><a name="line-354"></a><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-355"></a><span>  </span><span class="hs-identifier">alg</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="Data.OpenADT.Tutorial.html#Alg"><span class="hs-identifier hs-type">Alg</span></a><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#List1F"><span class="hs-identifier hs-type">List1F</span></a><span> </span><span class="hs-identifier hs-type">Int</span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#List2"><span class="hs-identifier hs-type">List2</span></a><span> </span><span class="hs-identifier hs-type">Int</span><span class="hs-special">)</span><span>
+</span><a name="line-356"></a><span>  </span><a name="local-6989586621679065077"><a href="#local-6989586621679065077"><span class="hs-identifier">alg</span></a></a><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#Cons1F"><span class="hs-identifier hs-var">Cons1F</span></a><span> </span><a name="local-6989586621679065078"><a href="#local-6989586621679065078"><span class="hs-identifier">a</span></a></a><span> </span><a name="local-6989586621679065079"><a href="#local-6989586621679065079"><span class="hs-identifier">x</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><a href="Data.OpenADT.Tutorial.html#Cons2"><span class="hs-identifier hs-var">Cons2</span></a><span> </span><a href="#local-6989586621679065078"><span class="hs-identifier hs-var">a</span></a><span> </span><a href="#local-6989586621679065078"><span class="hs-identifier hs-var">a</span></a><span> </span><a href="#local-6989586621679065079"><span class="hs-identifier hs-var">x</span></a><span>
+</span><a name="line-357"></a><span>  </span><span class="hs-identifier">alg</span><span> </span><a href="Data.OpenADT.Tutorial.html#NilF"><span class="hs-identifier hs-var">NilF</span></a><span> </span><span class="hs-glyph">=</span><span> </span><a href="Data.OpenADT.Tutorial.html#Nil"><span class="hs-identifier hs-var">Nil</span></a><span>
+</span><a name="line-358"></a><span>  </span><span class="hs-identifier">alg</span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">error</span><span> </span><span class="hs-operator hs-var">$</span><span>
+</span><a name="line-359"></a><span>    </span><span class="hs-string">&quot;Unfortunately using these patterns will always result in non-&quot;</span><span> </span><span class="hs-operator hs-var">&lt;&gt;</span><span>
+</span><a name="line-360"></a><span>    </span><span class="hs-string">&quot;exhaustive pattern match errors, hence the default case. :(&quot;</span><span>
+</span><a name="line-361"></a><span>
+</span><a name="line-362"></a><span class="hs-comment">-- * Explicit Cases</span><span>
+</span><a name="line-363"></a><span class="hs-comment">--</span><span>
+</span><a name="line-364"></a><span class="hs-comment">-- $cases</span><span>
+</span><a name="line-365"></a><span class="hs-comment">-- An alternative that does not produce incomplete pattern warnings is to use</span><span>
+</span><a name="line-366"></a><span class="hs-comment">-- the 'caseonF' or 'switchF' functions (which are versions of 'caseon' and</span><span>
+</span><a name="line-367"></a><span class="hs-comment">-- 'switch' that operate on a 'VarF'). Similar to 'reduceVarF', these functions</span><span>
+</span><a name="line-368"></a><span class="hs-comment">-- require a record of functions that are then applied to the variant. However,</span><span>
+</span><a name="line-369"></a><span class="hs-comment">-- 'caseonF' and 'switchF' are more general than 'reduceVarF' in the sense that</span><span>
+</span><a name="line-370"></a><span class="hs-comment">-- the return type of the functions are not restricted. Note that the labels</span><span>
+</span><a name="line-371"></a><span class="hs-comment">-- and functions of the provided record must exactly match that of the input</span><span>
+</span><a name="line-372"></a><span class="hs-comment">-- type: no constructors may be omitted, nor is it possible to write any kind</span><span>
+</span><a name="line-373"></a><span class="hs-comment">-- of default case.</span><span>
+</span><a name="line-374"></a><span class="hs-comment">--</span><span>
+</span><a name="line-375"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-376"></a><span class="hs-comment">-- result4 :: List1 String</span><span>
+</span><a name="line-377"></a><span class="hs-comment">-- result4 = 'cata' ('caseonF' r) exList1</span><span>
+</span><a name="line-378"></a><span class="hs-comment">--  where r = #nilF   .== (\\NilF' -&gt; Nil)</span><span>
+</span><a name="line-379"></a><span class="hs-comment">--         .+ #cons1F .== (\\(Cons1F' a x) -&gt; Cons1 (show \@Int a) x)</span><span>
+</span><a name="line-380"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-381"></a><span>
+</span><a name="line-382"></a><span class="hs-comment">-- | An alternative way of writing 'result3' using 'caseonF'.</span><span>
+</span><a name="line-383"></a><span class="hs-comment">--</span><span>
+</span><a name="line-384"></a><span class="hs-comment">-- &gt; &gt;&gt;&gt; print result4</span><span>
+</span><a name="line-385"></a><span class="hs-comment">-- &gt; Fix (VarF (Cons2F' 0 0 (Fix (VarF (Cons2F' 1 1 (Fix (VarF NilF')))))))</span><span>
+</span><a name="line-386"></a><span class="hs-identifier">result4</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="Data.OpenADT.Tutorial.html#List2"><span class="hs-identifier hs-type">List2</span></a><span> </span><span class="hs-identifier hs-type">Int</span><span>
+</span><a name="line-387"></a><a name="result4"><a href="Data.OpenADT.Tutorial.html#result4"><span class="hs-identifier">result4</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">cata</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-var">caseonF</span><span> </span><a href="#local-6989586621679065094"><span class="hs-identifier hs-var">r</span></a><span class="hs-special">)</span><span> </span><a href="Data.OpenADT.Tutorial.html#exList1"><span class="hs-identifier hs-var">exList1</span></a><span>
+</span><a name="line-388"></a><span> </span><span class="hs-keyword">where</span><span> </span><a name="local-6989586621679065094"><a href="#local-6989586621679065094"><span class="hs-identifier">r</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="">#nilF</span><span>   </span><span class="hs-operator hs-var">.==</span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><a href="Data.OpenADT.Tutorial.html#NilF%27"><span class="hs-identifier hs-var">NilF'</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="Data.OpenADT.Tutorial.html#Nil"><span class="hs-identifier hs-var">Nil</span></a><span class="hs-special">)</span><span>
+</span><a name="line-389"></a><span>        </span><span class="hs-operator hs-var">.+</span><span> </span><span class="">#cons1F</span><span> </span><span class="hs-operator hs-var">.==</span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#Cons1F%27"><span class="hs-identifier hs-var">Cons1F'</span></a><span> </span><a name="local-6989586621679065095"><a href="#local-6989586621679065095"><span class="hs-identifier">a</span></a></a><span> </span><a name="local-6989586621679065096"><a href="#local-6989586621679065096"><span class="hs-identifier">x</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="Data.OpenADT.Tutorial.html#Cons2"><span class="hs-identifier hs-var">Cons2</span></a><span> </span><a href="#local-6989586621679065095"><span class="hs-identifier hs-var">a</span></a><span> </span><a href="#local-6989586621679065095"><span class="hs-identifier hs-var">a</span></a><span> </span><a href="#local-6989586621679065096"><span class="hs-identifier hs-var">x</span></a><span class="hs-special">)</span><span>
+</span><a name="line-390"></a><span>
+</span><a name="line-391"></a><span class="hs-comment">-- * A Type Class Approach</span><span>
+</span><a name="line-392"></a><span class="hs-comment">--</span><span>
+</span><a name="line-393"></a><span class="hs-comment">-- $classes</span><span>
+</span><a name="line-394"></a><span class="hs-comment">-- An alternative approach to direct pattern matching is using type classes to</span><span>
+</span><a name="line-395"></a><span class="hs-comment">-- define each case of an open ADT. The type class function can then be applied</span><span>
+</span><a name="line-396"></a><span class="hs-comment">-- to each value in an ADT recursively with 'cata' as we have seen before.</span><span>
+</span><a name="line-397"></a><span class="hs-comment">--</span><span>
+</span><a name="line-398"></a><span class="hs-comment">-- This approach is beneficial compared to direct pattern matching because the</span><span>
+</span><a name="line-399"></a><span class="hs-comment">-- compiler can find \&quot;non-exhaustive matches\&quot; in the form of missing</span><span>
+</span><a name="line-400"></a><span class="hs-comment">-- instances. Similar to patterns, the typeclasses are generic enough to work</span><span>
+</span><a name="line-401"></a><span class="hs-comment">-- on any open ADT type provided all of that type's constructors satisfy the</span><span>
+</span><a name="line-402"></a><span class="hs-comment">-- constraint.</span><span>
+</span><a name="line-403"></a><span class="hs-comment">--</span><span>
+</span><a name="line-404"></a><span class="hs-comment">-- Consider, for example, the following class that defines an operation for</span><span>
+</span><a name="line-405"></a><span class="hs-comment">-- modifying the contents of a list.</span><span>
+</span><a name="line-406"></a><span class="hs-comment">--</span><span>
+</span><a name="line-407"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-408"></a><span class="hs-comment">-- class OverList a a' r (f :: * -&gt; *) where</span><span>
+</span><a name="line-409"></a><span class="hs-comment">--   fmapList' :: (a -&gt; a') -&gt; f (OpenADT r) -&gt; OpenADT r</span><span>
+</span><a name="line-410"></a><span class="hs-comment">--</span><span>
+</span><a name="line-411"></a><span class="hs-comment">-- instance ( OpenAlg r &quot;nilF&quot; NilF (OpenADT r)) =&gt; OverList a a' r NilF where</span><span>
+</span><a name="line-412"></a><span class="hs-comment">--   fmapList' _ NilF' = Nil</span><span>
+</span><a name="line-413"></a><span class="hs-comment">--</span><span>
+</span><a name="line-414"></a><span class="hs-comment">-- instance ( OpenAlg r &quot;cons1F&quot; (Cons1F a') (OpenADT r)) =&gt; OverList a a' r (Cons1F a) where</span><span>
+</span><a name="line-415"></a><span class="hs-comment">--   fmapList' f (Cons1F' a x) = Cons1 (f a) x</span><span>
+</span><a name="line-416"></a><span class="hs-comment">--</span><span>
+</span><a name="line-417"></a><span class="hs-comment">-- instance ( OpenAlg r &quot;cons2F&quot; (Cons2F a') (OpenADT r)) =&gt; OverList a a' r (Cons2F a) where</span><span>
+</span><a name="line-418"></a><span class="hs-comment">--   fmapList' f (Cons2F' a b x) = Cons2 (f a) (f b) x</span><span>
+</span><a name="line-419"></a><span class="hs-comment">--</span><span>
+</span><a name="line-420"></a><span class="hs-comment">-- instance (Forall v (OverList a a' r)) =&gt; OverList a a' r (VarF v) where</span><span>
+</span><a name="line-421"></a><span class="hs-comment">--   fmapList' f = varFAlg \@(OverList a a' r) (fmapList' f)</span><span>
+</span><a name="line-422"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-423"></a><span class="hs-comment">--</span><span>
+</span><a name="line-424"></a><span class="hs-comment">-- The class 'OverList' has instances for all the constructors of 'List1' and</span><span>
+</span><a name="line-425"></a><span class="hs-comment">-- 'List2'. The final step is to recursively apply 'fmapList'' to the ADT.</span><span>
+</span><a name="line-426"></a><span class="hs-comment">--</span><span>
+</span><a name="line-427"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-428"></a><span class="hs-comment">-- fmapList f = 'cata' (fmapList' f)</span><span>
+</span><a name="line-429"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-430"></a><span class="hs-comment">--</span><span>
+</span><a name="line-431"></a><span class="hs-comment">-- The function 'varFAlg' is used to apply 'fmapList'' to a 'VarF'. As long as</span><span>
+</span><a name="line-432"></a><span class="hs-comment">-- all constructors satisfy the required constraint ('OverList' in this case),</span><span>
+</span><a name="line-433"></a><span class="hs-comment">-- we do not need to know the exact constructor.</span><span>
+</span><a name="line-434"></a><span class="hs-comment">--</span><span>
+</span><a name="line-435"></a><span class="hs-comment">-- Note that the type of 'fmapList' is polymorphic in its input and output</span><span>
+</span><a name="line-436"></a><span class="hs-comment">-- rows. Using 'fmapList', we can operate on both 'List1' and 'List2' types, or</span><span>
+</span><a name="line-437"></a><span class="hs-comment">-- any type that combines the three constructors that have 'OverList'</span><span>
+</span><a name="line-438"></a><span class="hs-comment">-- instances.</span><span>
+</span><a name="line-439"></a><span>
+</span><a name="line-440"></a><span class="hs-comment">-- | This type class defines a fmap-like operation over lists.</span><span>
+</span><a name="line-441"></a><span class="hs-keyword">class</span><span> </span><a name="OverList"><a href="Data.OpenADT.Tutorial.html#OverList"><span class="hs-identifier">OverList</span></a></a><span> </span><a name="local-6989586621679064613"><a href="#local-6989586621679064613"><span class="hs-identifier">a</span></a></a><span> </span><a name="local-6989586621679064614"><a href="#local-6989586621679064614"><span class="hs-identifier">a'</span></a></a><span> </span><a name="local-6989586621679064615"><a href="#local-6989586621679064615"><span class="hs-identifier">r</span></a></a><span> </span><span class="hs-special">(</span><a name="local-6989586621679064616"><a href="#local-6989586621679064616"><span class="hs-identifier">f</span></a></a><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-operator hs-type">*</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-operator hs-type">*</span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-442"></a><span>  </span><a name="fmapList%27"><a href="Data.OpenADT.Tutorial.html#fmapList%27"><span class="hs-identifier">fmapList'</span></a></a><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><a href="#local-6989586621679064613"><span class="hs-identifier hs-type">a</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679064614"><span class="hs-identifier hs-type">a'</span></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679064616"><span class="hs-identifier hs-type">f</span></a><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">OpenADT</span><span> </span><a href="#local-6989586621679064615"><span class="hs-identifier hs-type">r</span></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">OpenADT</span><span> </span><a href="#local-6989586621679064615"><span class="hs-identifier hs-type">r</span></a><span>
+</span><a name="line-443"></a><span>
+</span><a name="line-444"></a><span class="hs-keyword">instance</span><span> </span><span class="hs-special">(</span><span> </span><span class="hs-identifier hs-type">OpenAlg</span><span> </span><a href="#local-6989586621679064635"><span class="hs-identifier hs-type">r</span></a><span> </span><span class="hs-string">&quot;nilF&quot;</span><span> </span><a href="Data.OpenADT.Tutorial.html#NilF"><span class="hs-identifier hs-type">NilF</span></a><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">OpenADT</span><span> </span><a href="#local-6989586621679064635"><span class="hs-identifier hs-type">r</span></a><span class="hs-special">)</span><span>
+</span><a name="line-445"></a><span>         </span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><a href="Data.OpenADT.Tutorial.html#OverList"><span class="hs-identifier hs-type">OverList</span></a><span> </span><a href="#local-6989586621679064636"><span class="hs-identifier hs-type">a</span></a><span> </span><a href="#local-6989586621679064637"><span class="hs-identifier hs-type">a'</span></a><span> </span><a href="#local-6989586621679064635"><span class="hs-identifier hs-type">r</span></a><span> </span><a href="Data.OpenADT.Tutorial.html#NilF"><span class="hs-identifier hs-type">NilF</span></a><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-446"></a><span>  </span><a name="local-8214565720323839510"><a href="Data.OpenADT.Tutorial.html#fmapList%27"><span class="hs-identifier">fmapList'</span></a></a><span> </span><span class="hs-identifier">_</span><span> </span><a href="Data.OpenADT.Tutorial.html#NilF%27"><span class="hs-identifier hs-var">NilF'</span></a><span> </span><span class="hs-glyph">=</span><span> </span><a href="Data.OpenADT.Tutorial.html#Nil"><span class="hs-identifier hs-var">Nil</span></a><span>
+</span><a name="line-447"></a><span>
+</span><a name="line-448"></a><span class="hs-keyword">instance</span><span> </span><span class="hs-special">(</span><span> </span><span class="hs-identifier hs-type">OpenAlg</span><span> </span><a href="#local-6989586621679064629"><span class="hs-identifier hs-type">r</span></a><span> </span><span class="hs-string">&quot;cons1F&quot;</span><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#Cons1F"><span class="hs-identifier hs-type">Cons1F</span></a><span> </span><a href="#local-6989586621679064630"><span class="hs-identifier hs-type">a'</span></a><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">OpenADT</span><span> </span><a href="#local-6989586621679064629"><span class="hs-identifier hs-type">r</span></a><span class="hs-special">)</span><span>
+</span><a name="line-449"></a><span>         </span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><a href="Data.OpenADT.Tutorial.html#OverList"><span class="hs-identifier hs-type">OverList</span></a><span> </span><a href="#local-6989586621679064631"><span class="hs-identifier hs-type">a</span></a><span> </span><a href="#local-6989586621679064630"><span class="hs-identifier hs-type">a'</span></a><span> </span><a href="#local-6989586621679064629"><span class="hs-identifier hs-type">r</span></a><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#Cons1F"><span class="hs-identifier hs-type">Cons1F</span></a><span> </span><a href="#local-6989586621679064631"><span class="hs-identifier hs-type">a</span></a><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-450"></a><span>  </span><a name="local-8214565720323839510"><a href="Data.OpenADT.Tutorial.html#fmapList%27"><span class="hs-identifier">fmapList'</span></a></a><span> </span><a name="local-6989586621679064632"><a href="#local-6989586621679064632"><span class="hs-identifier">f</span></a></a><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#Cons1F%27"><span class="hs-identifier hs-var">Cons1F'</span></a><span> </span><a name="local-6989586621679064633"><a href="#local-6989586621679064633"><span class="hs-identifier">a</span></a></a><span> </span><a name="local-6989586621679064634"><a href="#local-6989586621679064634"><span class="hs-identifier">x</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><a href="Data.OpenADT.Tutorial.html#Cons1"><span class="hs-identifier hs-var">Cons1</span></a><span> </span><span class="hs-special">(</span><a href="#local-6989586621679064632"><span class="hs-identifier hs-var">f</span></a><span> </span><a href="#local-6989586621679064633"><span class="hs-identifier hs-var">a</span></a><span class="hs-special">)</span><span> </span><a href="#local-6989586621679064634"><span class="hs-identifier hs-var">x</span></a><span>
+</span><a name="line-451"></a><span>
+</span><a name="line-452"></a><span class="hs-keyword">instance</span><span> </span><span class="hs-special">(</span><span> </span><span class="hs-identifier hs-type">OpenAlg</span><span> </span><a href="#local-6989586621679064622"><span class="hs-identifier hs-type">r</span></a><span> </span><span class="hs-string">&quot;cons2F&quot;</span><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#Cons2F"><span class="hs-identifier hs-type">Cons2F</span></a><span> </span><a href="#local-6989586621679064623"><span class="hs-identifier hs-type">a'</span></a><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">OpenADT</span><span> </span><a href="#local-6989586621679064622"><span class="hs-identifier hs-type">r</span></a><span class="hs-special">)</span><span>
+</span><a name="line-453"></a><span>         </span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><a href="Data.OpenADT.Tutorial.html#OverList"><span class="hs-identifier hs-type">OverList</span></a><span> </span><a href="#local-6989586621679064624"><span class="hs-identifier hs-type">a</span></a><span> </span><a href="#local-6989586621679064623"><span class="hs-identifier hs-type">a'</span></a><span> </span><a href="#local-6989586621679064622"><span class="hs-identifier hs-type">r</span></a><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#Cons2F"><span class="hs-identifier hs-type">Cons2F</span></a><span> </span><a href="#local-6989586621679064624"><span class="hs-identifier hs-type">a</span></a><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-454"></a><span>  </span><a name="local-8214565720323839510"><a href="Data.OpenADT.Tutorial.html#fmapList%27"><span class="hs-identifier">fmapList'</span></a></a><span> </span><a name="local-6989586621679064625"><a href="#local-6989586621679064625"><span class="hs-identifier">f</span></a></a><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#Cons2F%27"><span class="hs-identifier hs-var">Cons2F'</span></a><span> </span><a name="local-6989586621679064626"><a href="#local-6989586621679064626"><span class="hs-identifier">a</span></a></a><span> </span><a name="local-6989586621679064627"><a href="#local-6989586621679064627"><span class="hs-identifier">b</span></a></a><span> </span><a name="local-6989586621679064628"><a href="#local-6989586621679064628"><span class="hs-identifier">x</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><a href="Data.OpenADT.Tutorial.html#Cons2"><span class="hs-identifier hs-var">Cons2</span></a><span> </span><span class="hs-special">(</span><a href="#local-6989586621679064625"><span class="hs-identifier hs-var">f</span></a><span> </span><a href="#local-6989586621679064626"><span class="hs-identifier hs-var">a</span></a><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><a href="#local-6989586621679064625"><span class="hs-identifier hs-var">f</span></a><span> </span><a href="#local-6989586621679064627"><span class="hs-identifier hs-var">b</span></a><span class="hs-special">)</span><span> </span><a href="#local-6989586621679064628"><span class="hs-identifier hs-var">x</span></a><span>
+</span><a name="line-455"></a><span>
+</span><a name="line-456"></a><span class="hs-keyword">instance</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Forall</span><span> </span><a href="#local-6989586621679064617"><span class="hs-identifier hs-type">v</span></a><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#OverList"><span class="hs-identifier hs-type">OverList</span></a><span> </span><a href="#local-6989586621679064618"><span class="hs-identifier hs-type">a</span></a><span> </span><a href="#local-6989586621679064619"><span class="hs-identifier hs-type">a'</span></a><span> </span><a href="#local-6989586621679064620"><span class="hs-identifier hs-type">r</span></a><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><a href="Data.OpenADT.Tutorial.html#OverList"><span class="hs-identifier hs-type">OverList</span></a><span> </span><a href="#local-6989586621679064618"><span class="hs-identifier hs-type">a</span></a><span> </span><a href="#local-6989586621679064619"><span class="hs-identifier hs-type">a'</span></a><span> </span><a href="#local-6989586621679064620"><span class="hs-identifier hs-type">r</span></a><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">VarF</span><span> </span><a href="#local-6989586621679064617"><span class="hs-identifier hs-type">v</span></a><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-457"></a><span>  </span><a name="local-8214565720323839510"><a href="Data.OpenADT.Tutorial.html#fmapList%27"><span class="hs-identifier">fmapList'</span></a></a><span> </span><a name="local-6989586621679064621"><a href="#local-6989586621679064621"><span class="hs-identifier">f</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">varFAlg</span><span> </span><span class="hs-glyph">@</span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#OverList"><span class="hs-identifier hs-type">OverList</span></a><span> </span><a href="#local-6989586621679064618"><span class="hs-identifier hs-type">a</span></a><span> </span><a href="#local-6989586621679064619"><span class="hs-identifier hs-type">a'</span></a><span> </span><a href="#local-6989586621679064620"><span class="hs-identifier hs-type">r</span></a><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#fmapList%27"><span class="hs-identifier hs-var">fmapList'</span></a><span> </span><a href="#local-6989586621679064621"><span class="hs-identifier hs-var">f</span></a><span class="hs-special">)</span><span>
+</span><a name="line-458"></a><span>
+</span><a name="line-459"></a><span class="hs-comment">-- | Apply the 'fmapList'' function to any @(OpenADT r)@ provided all its</span><span>
+</span><a name="line-460"></a><span class="hs-comment">-- constructors satisfy the constraint @(OverList a a' s)@.</span><span>
+</span><a name="line-461"></a><span class="hs-identifier">fmapList</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><a name="local-6989586621679064638"><a href="#local-6989586621679064638"><span class="hs-identifier">a</span></a></a><span> </span><a name="local-6989586621679064639"><a href="#local-6989586621679064639"><span class="hs-identifier">a'</span></a></a><span> </span><a name="local-6989586621679064640"><a href="#local-6989586621679064640"><span class="hs-identifier">r</span></a></a><span> </span><a name="local-6989586621679064641"><a href="#local-6989586621679064641"><span class="hs-identifier">s</span></a></a><span class="hs-operator">.</span><span>
+</span><a name="line-462"></a><span>            </span><span class="hs-special">(</span><span> </span><span class="hs-identifier hs-type">Forall</span><span> </span><a href="#local-6989586621679064640"><span class="hs-identifier hs-type">r</span></a><span> </span><span class="hs-identifier hs-type">Functor</span><span>
+</span><a name="line-463"></a><span>            </span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Forall</span><span> </span><a href="#local-6989586621679064640"><span class="hs-identifier hs-type">r</span></a><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#OverList"><span class="hs-identifier hs-type">OverList</span></a><span> </span><a href="#local-6989586621679064638"><span class="hs-identifier hs-type">a</span></a><span> </span><a href="#local-6989586621679064639"><span class="hs-identifier hs-type">a'</span></a><span> </span><a href="#local-6989586621679064641"><span class="hs-identifier hs-type">s</span></a><span class="hs-special">)</span><span>
+</span><a name="line-464"></a><span>            </span><span class="hs-special">)</span><span>
+</span><a name="line-465"></a><span>            </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><a href="#local-6989586621679064638"><span class="hs-identifier hs-type">a</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679064639"><span class="hs-identifier hs-type">a'</span></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">OpenADT</span><span> </span><a href="#local-6989586621679064640"><span class="hs-identifier hs-type">r</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">OpenADT</span><span> </span><a href="#local-6989586621679064641"><span class="hs-identifier hs-type">s</span></a><span>
+</span><a name="line-466"></a><a name="fmapList"><a href="Data.OpenADT.Tutorial.html#fmapList"><span class="hs-identifier">fmapList</span></a></a><span> </span><a name="local-6989586621679065097"><a href="#local-6989586621679065097"><span class="hs-identifier">f</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">cata</span><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#fmapList%27"><span class="hs-identifier hs-var">fmapList'</span></a><span> </span><a href="#local-6989586621679065097"><span class="hs-identifier hs-var">f</span></a><span class="hs-special">)</span><span>
+</span><a name="line-467"></a><span>
+</span><a name="line-468"></a><span class="hs-comment">-- | Demonstrate that 'fmapList' can be applied to 'exList1'.</span><span>
+</span><a name="line-469"></a><span class="hs-comment">--</span><span>
+</span><a name="line-470"></a><span class="hs-comment">-- &gt; result5 = fmapList (show @Int) exList1 :: List1 String</span><span>
+</span><a name="line-471"></a><span class="hs-comment">--</span><span>
+</span><a name="line-472"></a><span class="hs-comment">-- &gt; &gt;&gt;&gt; print result5</span><span>
+</span><a name="line-473"></a><span class="hs-comment">-- &gt; Fix (VarF (Cons1F' &quot;0&quot; (Fix (VarF (Cons1F' &quot;1&quot; (Fix (VarF NilF')))))))</span><span>
+</span><a name="line-474"></a><span class="hs-identifier">result5</span><span>  </span><span class="hs-glyph">::</span><span> </span><a href="Data.OpenADT.Tutorial.html#List1"><span class="hs-identifier hs-type">List1</span></a><span> </span><span class="hs-identifier hs-type">String</span><span>
+</span><a name="line-475"></a><a name="result5"><a href="Data.OpenADT.Tutorial.html#result5"><span class="hs-identifier">result5</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a href="Data.OpenADT.Tutorial.html#fmapList"><span class="hs-identifier hs-var">fmapList</span></a><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-var">show</span><span> </span><span class="hs-glyph">@</span><span class="hs-identifier hs-type">Int</span><span class="hs-special">)</span><span> </span><a href="Data.OpenADT.Tutorial.html#exList1"><span class="hs-identifier hs-var">exList1</span></a><span>
+</span><a name="line-476"></a><span>
+</span><a name="line-477"></a><span class="hs-comment">-- | Demonstrate that 'fmapList' can be applied to 'exList2'.</span><span>
+</span><a name="line-478"></a><span class="hs-comment">--</span><span>
+</span><a name="line-479"></a><span class="hs-comment">-- &gt; result6 = fmapList (show @Int) exList2 :: List2 String</span><span>
+</span><a name="line-480"></a><span class="hs-comment">--</span><span>
+</span><a name="line-481"></a><span class="hs-comment">-- &gt; &gt;&gt;&gt; print result6</span><span>
+</span><a name="line-482"></a><span class="hs-comment">-- &gt; Fix (VarF (Cons2F' &quot;2&quot; &quot;3&quot; (Fix (VarF (Cons1F' &quot;4&quot; (Fix (VarF NilF')))))))</span><span>
+</span><a name="line-483"></a><span class="hs-identifier">result6</span><span>  </span><span class="hs-glyph">::</span><span> </span><a href="Data.OpenADT.Tutorial.html#List2"><span class="hs-identifier hs-type">List2</span></a><span> </span><span class="hs-identifier hs-type">String</span><span>
+</span><a name="line-484"></a><a name="result6"><a href="Data.OpenADT.Tutorial.html#result6"><span class="hs-identifier">result6</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a href="Data.OpenADT.Tutorial.html#fmapList"><span class="hs-identifier hs-var">fmapList</span></a><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-var">show</span><span> </span><span class="hs-glyph">@</span><span class="hs-identifier hs-type">Int</span><span class="hs-special">)</span><span> </span><a href="Data.OpenADT.Tutorial.html#exList2"><span class="hs-identifier hs-var">exList2</span></a><span>
+</span><a name="line-485"></a><span>
+</span><a name="line-486"></a><span class="hs-comment">-- * Combining Explicit Cases and Type Classes</span><span>
+</span><a name="line-487"></a><span class="hs-comment">--</span><span>
+</span><a name="line-488"></a><span class="hs-comment">-- $cases2</span><span>
+</span><a name="line-489"></a><span class="hs-comment">-- Suppose we have an ADT where we want to operate on a subset of its</span><span>
+</span><a name="line-490"></a><span class="hs-comment">-- constructors. For example, a subset of constructors do not implement a type</span><span>
+</span><a name="line-491"></a><span class="hs-comment">-- class that the others do, or perhaps we just want to override a single</span><span>
+</span><a name="line-492"></a><span class="hs-comment">-- constructor while using some default implementation for the other cases.</span><span>
+</span><a name="line-493"></a><span class="hs-comment">-- These situations can be handled with the type class approach just discussed</span><span>
+</span><a name="line-494"></a><span class="hs-comment">-- with overlappable instances. Unfortunately, among other issues, we do not</span><span>
+</span><a name="line-495"></a><span class="hs-comment">-- receive compiler errors if we add a constructor but forget to write its</span><span>
+</span><a name="line-496"></a><span class="hs-comment">-- instance; the default instance automatically takes over.</span><span>
+</span><a name="line-497"></a><span class="hs-comment">--</span><span>
+</span><a name="line-498"></a><span class="hs-comment">-- Fortunately, we can use a combination of explicit cases and the type class</span><span>
+</span><a name="line-499"></a><span class="hs-comment">-- approach to prevent this from happening. The idea is to partition the ADT</span><span>
+</span><a name="line-500"></a><span class="hs-comment">-- variant and handle each set of constructors separately. To partition the</span><span>
+</span><a name="line-501"></a><span class="hs-comment">-- ADT, we can use 'multiTrialF' (see also 'multiTrial') one or more times.</span><span>
+</span><a name="line-502"></a><span class="hs-comment">--</span><span>
+</span><a name="line-503"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-504"></a><span class="hs-comment">-- result7 = 'cata' alg exList2 where</span><span>
+</span><a name="line-505"></a><span class="hs-comment">--   alg :: Alg (List2F Int) (List1 String)</span><span>
+</span><a name="line-506"></a><span class="hs-comment">--   alg w = case 'multiTrialF' \@(&quot;cons2F&quot; .== Cons2F Int) w of</span><span>
+</span><a name="line-507"></a><span class="hs-comment">--</span><span>
+</span><a name="line-508"></a><span class="hs-comment">--     -- Explicit handling of specified constructors</span><span>
+</span><a name="line-509"></a><span class="hs-comment">--     Left v -&gt; 'caseonF' r v</span><span>
+</span><a name="line-510"></a><span class="hs-comment">--</span><span>
+</span><a name="line-511"></a><span class="hs-comment">--     -- All others handled by fmapList'</span><span>
+</span><a name="line-512"></a><span class="hs-comment">--     Right leftovers -&gt; 'fmapList'' (show \@Int) leftovers</span><span>
+</span><a name="line-513"></a><span class="hs-comment">--</span><span>
+</span><a name="line-514"></a><span class="hs-comment">--   r = #cons2F .== \\(Cons2F' a b x) -&gt;</span><span>
+</span><a name="line-515"></a><span class="hs-comment">--         Cons1 (&quot;(&quot; &lt;&gt; show a &lt;&gt; &quot; : &quot; &lt;&gt; show b &lt;&gt; &quot;)&quot;) x</span><span>
+</span><a name="line-516"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-517"></a><span>
+</span><a name="line-518"></a><span class="hs-comment">-- | Demonstrate how to handle subsets of a 'VarF' individually.</span><span>
+</span><a name="line-519"></a><span class="hs-comment">--</span><span>
+</span><a name="line-520"></a><span class="hs-comment">-- Below is an alternate, but identical, implementation for the case where one</span><span>
+</span><a name="line-521"></a><span class="hs-comment">-- subset of variants matched is a single variant ('trialF' is used instead of</span><span>
+</span><a name="line-522"></a><span class="hs-comment">-- 'multiTrialF').</span><span>
+</span><a name="line-523"></a><span class="hs-comment">--</span><span>
+</span><a name="line-524"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-525"></a><span class="hs-comment">-- result7 = 'cata' alg exList2 where</span><span>
+</span><a name="line-526"></a><span class="hs-comment">--   alg w = case 'trialF' w #cons2F of</span><span>
+</span><a name="line-527"></a><span class="hs-comment">--     Left (Cons2F' a b x) -&gt; Cons1 (&quot;(&quot; &lt;&gt; show a &lt;&gt; &quot; : &quot; &lt;&gt; show b &lt;&gt; &quot;)&quot;) x</span><span>
+</span><a name="line-528"></a><span class="hs-comment">--     Right leftovers -&gt; 'fmapList'' (show \@Int) leftovers</span><span>
+</span><a name="line-529"></a><span class="hs-comment">-- @</span><span>
+</span><a name="line-530"></a><span class="hs-comment">--</span><span>
+</span><a name="line-531"></a><span class="hs-comment">-- &gt; &gt;&gt;&gt; print result7</span><span>
+</span><a name="line-532"></a><span class="hs-comment">-- &gt; Fix (VarF (Cons1F' &quot;(2 : 3)&quot; (Fix (VarF (Cons1F' &quot;4&quot; (Fix (VarF NilF')))))))</span><span>
+</span><a name="line-533"></a><span class="hs-identifier">result7</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="Data.OpenADT.Tutorial.html#List1"><span class="hs-identifier hs-type">List1</span></a><span> </span><span class="hs-identifier hs-type">String</span><span>
+</span><a name="line-534"></a><a name="result7"><a href="Data.OpenADT.Tutorial.html#result7"><span class="hs-identifier">result7</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">cata</span><span> </span><a href="#local-6989586621679065098"><span class="hs-identifier hs-var">alg</span></a><span> </span><a href="Data.OpenADT.Tutorial.html#exList2"><span class="hs-identifier hs-var">exList2</span></a><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-535"></a><span>  </span><span class="hs-identifier">alg</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="Data.OpenADT.Tutorial.html#Alg"><span class="hs-identifier hs-type">Alg</span></a><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#List2F"><span class="hs-identifier hs-type">List2F</span></a><span> </span><span class="hs-identifier hs-type">Int</span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#List1"><span class="hs-identifier hs-type">List1</span></a><span> </span><span class="hs-identifier hs-type">String</span><span class="hs-special">)</span><span>
+</span><a name="line-536"></a><span>  </span><a name="local-6989586621679065098"><a href="#local-6989586621679065098"><span class="hs-identifier">alg</span></a></a><span> </span><a name="local-6989586621679065100"><a href="#local-6989586621679065100"><span class="hs-identifier">w</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="hs-identifier hs-var">multiTrialF</span><span> </span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="hs-string">&quot;cons2F&quot;</span><span> </span><span class="hs-operator hs-type">.==</span><span> </span><a href="Data.OpenADT.Tutorial.html#Cons2F"><span class="hs-identifier hs-type">Cons2F</span></a><span> </span><span class="hs-identifier hs-type">Int</span><span class="hs-special">)</span><span> </span><a href="#local-6989586621679065100"><span class="hs-identifier hs-var">w</span></a><span> </span><span class="hs-keyword">of</span><span>
+</span><a name="line-537"></a><span>
+</span><a name="line-538"></a><span>    </span><span class="hs-comment">-- Explicit handling of specified constructors</span><span>
+</span><a name="line-539"></a><span>    </span><span class="hs-identifier hs-var">Left</span><span> </span><a name="local-6989586621679065241"><a href="#local-6989586621679065241"><span class="hs-identifier">v</span></a></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-var">caseonF</span><span> </span><a href="#local-6989586621679065099"><span class="hs-identifier hs-var">r</span></a><span> </span><a href="#local-6989586621679065241"><span class="hs-identifier hs-var">v</span></a><span>
+</span><a name="line-540"></a><span>
+</span><a name="line-541"></a><span>    </span><span class="hs-comment">-- All others handled by fmapList'</span><span>
+</span><a name="line-542"></a><span>    </span><span class="hs-identifier hs-var">Right</span><span> </span><a name="local-6989586621679065242"><a href="#local-6989586621679065242"><span class="hs-identifier">leftovers</span></a></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="Data.OpenADT.Tutorial.html#fmapList%27"><span class="hs-identifier hs-var">fmapList'</span></a><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-var">show</span><span> </span><span class="hs-glyph">@</span><span class="hs-identifier hs-type">Int</span><span class="hs-special">)</span><span> </span><a href="#local-6989586621679065242"><span class="hs-identifier hs-var">leftovers</span></a><span>
+</span><a name="line-543"></a><span>
+</span><a name="line-544"></a><span>  </span><a name="local-6989586621679065099"><a href="#local-6989586621679065099"><span class="hs-identifier">r</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="">#cons2F</span><span> </span><span class="hs-operator hs-var">.==</span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><a href="Data.OpenADT.Tutorial.html#Cons2F%27"><span class="hs-identifier hs-var">Cons2F'</span></a><span> </span><a name="local-6989586621679065243"><a href="#local-6989586621679065243"><span class="hs-identifier">a</span></a></a><span> </span><a name="local-6989586621679065244"><a href="#local-6989586621679065244"><span class="hs-identifier">b</span></a></a><span> </span><a name="local-6989586621679065245"><a href="#local-6989586621679065245"><span class="hs-identifier">x</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><a name="line-545"></a><span>        </span><a href="Data.OpenADT.Tutorial.html#Cons1"><span class="hs-identifier hs-var">Cons1</span></a><span> </span><span class="hs-special">(</span><span class="hs-string">&quot;(&quot;</span><span> </span><span class="hs-operator hs-var">&lt;&gt;</span><span> </span><span class="hs-identifier hs-var">show</span><span> </span><a href="#local-6989586621679065243"><span class="hs-identifier hs-var">a</span></a><span> </span><span class="hs-operator hs-var">&lt;&gt;</span><span> </span><span class="hs-string">&quot; : &quot;</span><span> </span><span class="hs-operator hs-var">&lt;&gt;</span><span> </span><span class="hs-identifier hs-var">show</span><span> </span><a href="#local-6989586621679065244"><span class="hs-identifier hs-var">b</span></a><span> </span><span class="hs-operator hs-var">&lt;&gt;</span><span> </span><span class="hs-string">&quot;)&quot;</span><span class="hs-special">)</span><span> </span><a href="#local-6989586621679065245"><span class="hs-identifier hs-var">x</span></a><span>
+</span><a name="line-546"></a><span>
+</span><a name="line-547"></a><span class="hs-comment">-- * Ordering</span><span>
+</span><a name="line-548"></a><span class="hs-comment">--</span><span>
+</span><a name="line-549"></a><span class="hs-comment">-- $ord</span><span>
+</span><a name="line-550"></a><span class="hs-comment">-- OpenADT data types are orderable provided all the underlying types are</span><span>
+</span><a name="line-551"></a><span class="hs-comment">-- orderable. When determining the order of two values with different structure</span><span>
+</span><a name="line-552"></a><span class="hs-comment">-- (note that this means the /types/ within the 'VarF' variant are different),</span><span>
+</span><a name="line-553"></a><span class="hs-comment">-- open-adt uses the ordering of the underlying labels, which is alphabetical.</span><span>
+</span><a name="line-554"></a><span class="hs-comment">-- This is the same method used in the Ord instance for 'Data.Row.Variants.Var'</span><span>
+</span><a name="line-555"></a><span class="hs-comment">-- in the [https://hackage.haskell.org/package/row-types](row-types) package.</span><span>
+</span><a name="line-556"></a><span class="hs-comment">--</span><span>
+</span><a name="line-557"></a><span class="hs-comment">-- Consider the following comparisons of List2's.</span><span>
+</span><a name="line-558"></a><span class="hs-comment">--</span><span>
+</span><a name="line-559"></a><span class="hs-comment">-- &gt; &gt;&gt;&gt; compare (Cons1 2 Nil) (Cons2 0 0 Nil :: List2 Int)</span><span>
+</span><a name="line-560"></a><span class="hs-comment">-- &gt; LT</span><span>
+</span><a name="line-561"></a><span class="hs-comment">--</span><span>
+</span><a name="line-562"></a><span class="hs-comment">-- &gt; &gt;&gt;&gt; compare (Cons1 2 Nil) (Cons1 1 Nil :: List2 Int)</span><span>
+</span><a name="line-563"></a><span class="hs-comment">-- &gt; GT</span><span>
+</span><a name="line-564"></a><span class="hs-comment">--</span><span>
+</span><a name="line-565"></a><span class="hs-comment">-- In the first example the 'Cons1' label (&quot;cons1F&quot;) is less than the 'Cons2' label</span><span>
+</span><a name="line-566"></a><span class="hs-comment">-- (&quot;cons2F&quot;).</span><span>
+</span><a name="line-567"></a><span class="hs-comment">-- In the second example the head of both lists is the same, so the first list</span><span>
+</span><a name="line-568"></a><span class="hs-comment">-- is greater since 2 &gt; 1.</span><span>
+</span><a name="line-569"></a><span>
+</span><a name="line-570"></a><span class="hs-comment">-- | This is the function invoked by the executable in this package. It simply</span><span>
+</span><a name="line-571"></a><span class="hs-comment">-- prints out the examples.</span><span>
+</span><a name="line-572"></a><span class="hs-identifier">main'</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">IO</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><a name="line-573"></a><a name="main%27"><a href="Data.OpenADT.Tutorial.html#main%27"><span class="hs-identifier">main'</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><a name="line-574"></a><span>  </span><span class="hs-identifier hs-var">putStrLn</span><span> </span><span class="hs-string">&quot;exList1:&quot;</span><span>
+</span><a name="line-575"></a><span>  </span><span class="hs-identifier hs-var">print</span><span> </span><a href="Data.OpenADT.Tutorial.html#exList1"><span class="hs-identifier hs-var">exList1</span></a><span>
+</span><a name="line-576"></a><span>
+</span><a name="line-577"></a><span>  </span><span class="hs-identifier hs-var">putStrLn</span><span> </span><span class="hs-string">&quot;\nexList2:&quot;</span><span>
+</span><a name="line-578"></a><span>  </span><span class="hs-identifier hs-var">print</span><span> </span><a href="Data.OpenADT.Tutorial.html#exList2"><span class="hs-identifier hs-var">exList2</span></a><span>
+</span><a name="line-579"></a><span>
+</span><a name="line-580"></a><span>  </span><span class="hs-identifier hs-var">putStrLn</span><span> </span><span class="hs-string">&quot;\nresult1:&quot;</span><span>
+</span><a name="line-581"></a><span>  </span><span class="hs-identifier hs-var">print</span><span> </span><a href="Data.OpenADT.Tutorial.html#result1"><span class="hs-identifier hs-var">result1</span></a><span>
+</span><a name="line-582"></a><span>
+</span><a name="line-583"></a><span>  </span><span class="hs-identifier hs-var">putStrLn</span><span> </span><span class="hs-string">&quot;\nresult2:&quot;</span><span>
+</span><a name="line-584"></a><span>  </span><span class="hs-identifier hs-var">print</span><span> </span><a href="Data.OpenADT.Tutorial.html#result2"><span class="hs-identifier hs-var">result2</span></a><span>
+</span><a name="line-585"></a><span>
+</span><a name="line-586"></a><span>  </span><span class="hs-identifier hs-var">putStrLn</span><span> </span><span class="hs-string">&quot;\nresult3:&quot;</span><span>
+</span><a name="line-587"></a><span>  </span><span class="hs-identifier hs-var">print</span><span> </span><a href="Data.OpenADT.Tutorial.html#result3"><span class="hs-identifier hs-var">result3</span></a><span>
+</span><a name="line-588"></a><span>
+</span><a name="line-589"></a><span>  </span><span class="hs-identifier hs-var">putStrLn</span><span> </span><span class="hs-string">&quot;\nresult4:&quot;</span><span>
+</span><a name="line-590"></a><span>  </span><span class="hs-identifier hs-var">print</span><span> </span><a href="Data.OpenADT.Tutorial.html#result4"><span class="hs-identifier hs-var">result4</span></a><span>
+</span><a name="line-591"></a><span>
+</span><a name="line-592"></a><span>  </span><span class="hs-identifier hs-var">putStrLn</span><span> </span><span class="hs-string">&quot;\nresult5:&quot;</span><span>
+</span><a name="line-593"></a><span>  </span><span class="hs-identifier hs-var">print</span><span> </span><a href="Data.OpenADT.Tutorial.html#result5"><span class="hs-identifier hs-var">result5</span></a><span>
+</span><a name="line-594"></a><span>
+</span><a name="line-595"></a><span>  </span><span class="hs-identifier hs-var">putStrLn</span><span> </span><span class="hs-string">&quot;\nresult6:&quot;</span><span>
+</span><a name="line-596"></a><span>  </span><span class="hs-identifier hs-var">print</span><span> </span><a href="Data.OpenADT.Tutorial.html#result6"><span class="hs-identifier hs-var">result6</span></a><span>
+</span><a name="line-597"></a><span>
+</span><a name="line-598"></a><span>  </span><span class="hs-identifier hs-var">putStrLn</span><span> </span><span class="hs-string">&quot;\nresult7:&quot;</span><span>
+</span><a name="line-599"></a><span>  </span><span class="hs-identifier hs-var">print</span><span> </span><a href="Data.OpenADT.Tutorial.html#result7"><span class="hs-identifier hs-var">result7</span></a><span>
+</span><a name="line-600"></a></pre></body></html>
