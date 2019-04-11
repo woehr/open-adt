@@ -1,4 +1,11 @@
--- | Description : A short tutorial with code.
+-- |
+-- Module      : Data.OpenADT.Tutorial
+-- Copyright   : Copyright (c) Jordan Woehr, 2018-2019
+-- License     : BSD
+-- Maintainer  : Jordan Woehr
+-- Stability   : experimental
+--
+-- Description : A short tutorial with code.
 
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE CPP #-}
@@ -38,8 +45,9 @@ import           Data.Functor.Foldable                    ( Fix(..)
                                                           )
 
 -- deriving-compat
-import           Text.Show.Deriving
 import           Data.Eq.Deriving
+import           Data.Ord.Deriving
+import           Text.Show.Deriving
 
 -- * Introduction
 --
@@ -86,19 +94,23 @@ type Alg f x = f x -> x
 
 -- | The base case of a list type.
 data NilF x = NilF'
-  deriving (Eq, Functor, Show)
+  deriving (Eq, Functor, Ord, Show)
 
 -- | A one element cons element.
 data Cons1F a x = Cons1F' a x
-  deriving (Eq, Functor, Show)
+  deriving (Eq, Functor, Ord, Show)
 
 -- | A two element cons element.
 data Cons2F a x = Cons2F' a a x
-  deriving (Eq, Functor, Show)
+  deriving (Eq, Functor, Ord, Show)
 
 deriveEq1 ''NilF
 deriveEq1 ''Cons1F
 deriveEq1 ''Cons2F
+
+deriveOrd1 ''NilF
+deriveOrd1 ''Cons1F
+deriveOrd1 ''Cons2F
 
 deriveShow1 ''NilF
 deriveShow1 ''Cons1F
@@ -122,10 +134,7 @@ type List1RowF a = ( "nilF"   .== NilF
 
 -- | The row of the second list type. This type re-uses the constructors of
 -- 'List1RowF' and includes a third constructor: a two element cons.
-type List2RowF a = ( "nilF"   .== NilF
-                  .+ "cons1F" .== Cons1F a
-                  .+ "cons2F" .== Cons2F a
-                   )
+type List2RowF a = List1RowF a .+ ("cons2F" .== Cons2F a)
 
 -- * Types
 --

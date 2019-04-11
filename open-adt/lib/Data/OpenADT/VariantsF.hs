@@ -1,6 +1,6 @@
 -- |
 -- Module      : Data.OpenADT.VariantsF
--- Copyright   : Copyright (c) Jordan Woehr, 2018
+-- Copyright   : Copyright (c) Jordan Woehr, 2018-2019
 -- License     : BSD
 -- Maintainer  : Jordan Woehr
 -- Stability   : experimental
@@ -30,7 +30,7 @@ import           Data.OpenADT.VarF
 
 -- | Like 'diversify' but specialised for 'VarF'.
 --
--- @since 1.0.0
+-- @since 1.0
 diversifyF
   :: forall r' x r
    . (ApplyRow x r .\/ ApplyRow x r' ≈ ApplyRow x (r .\/ r'))
@@ -40,7 +40,7 @@ diversifyF = mapVarF $ diversify @(ApplyRow x r') @(ApplyRow x r)
 
 -- | Like 'trial' but specialised for 'VarF'.
 --
--- @since 1.0.0
+-- @since 1.0
 trialF
   :: (ApplyRow x r .- l ≈ ApplyRow x (r .- l), KnownSymbol l)
   => VarF r x
@@ -50,7 +50,7 @@ trialF v l = (id +++ VarF) (trial (unVarF v) l)
 
 -- | Like 'multiTrial' but specialised for 'VarF'.
 --
--- @since 1.0.0
+-- @since 1.0
 multiTrialF
   :: forall u v x
    . ( ApplyRow x v .\\ ApplyRow x u ≈ ApplyRow x (v .\\ u)
@@ -63,7 +63,7 @@ multiTrialF = (VarF +++ VarF) . multiTrial . unVarF
 
 -- | Like 'erase' but specialised for 'VarF'.
 --
--- @since 1.0.0
+-- @since 1.0
 eraseF
   :: forall c r x b
    . Forall (ApplyRow x r) c
@@ -74,7 +74,7 @@ eraseF f = snd @String . eraseWithLabelsF @c f
 
 -- | Like 'eraseWithLabels' but specialised for 'VarF'.
 --
--- @since 1.0.0
+-- @since 1.0
 eraseWithLabelsF
   :: forall c r x s b
    . (Forall (ApplyRow x r) c, IsString s)
@@ -85,12 +85,12 @@ eraseWithLabelsF f = eraseWithLabels @c f . unVarF
 
 -- | Like 'caseon' but specialised for 'VarF'.
 --
--- @since 1.0.0
+-- @since 1.0
 caseonF :: (Switch (ApplyRow x v) r y) => Rec r -> VarF v x -> y
 caseonF r = caseon r . unVarF
 
 -- | Like 'switch' but specialised for 'VarF'.
 --
--- @since 1.0.0
+-- @since 1.0
 switchF :: (Switch (ApplyRow x v) r y) => VarF v x -> Rec r -> y
 switchF v = switch (unVarF v)

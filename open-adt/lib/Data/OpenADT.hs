@@ -1,6 +1,6 @@
 -- |
 -- Module      : Data.OpenADT
--- Copyright   : Copyright (c) Jordan Woehr, 2018
+-- Copyright   : Copyright (c) Jordan Woehr, 2018-2019
 -- License     : BSD
 -- Maintainer  : Jordan Woehr
 -- Stability   : experimental

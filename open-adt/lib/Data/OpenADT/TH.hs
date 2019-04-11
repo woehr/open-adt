@@ -1,6 +1,6 @@
 -- |
 -- Module      : Data.OpenADT.TH
--- Copyright   : Copyright (c) Jordan Woehr, 2018
+-- Copyright   : Copyright (c) Jordan Woehr, 2018-2019
 -- License     : BSD
 -- Maintainer  : Jordan Woehr
 -- Stability   : experimental
@@ -49,6 +49,8 @@ import           Data.OpenADT.VarF                        ( OpenAlg
 -- >             => a -> OpenADT r -> OpenADT r
 -- >   where FooF a v = VarF (IsJust (Label :: Label "foo") (FooF' a v))
 -- > pattern Foo  a v = Fix (FooF a v)
+--
+-- @since 1.0
 mkVarPattern :: Name   -- ^ The 'Name' of the type to create patterns for.
              -> String -- ^ The label in the variant the constructor will have.
              -> String -- ^ The name of the fixed pattern.

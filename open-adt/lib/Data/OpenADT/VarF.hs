@@ -1,6 +1,6 @@
 -- |
 -- Module      : Data.OpenADT.VarF
--- Copyright   : Copyright (c) Jordan Woehr, 2018
+-- Copyright   : Copyright (c) Jordan Woehr, 2018-2019
 -- License     : BSD
 -- Maintainer  : Jordan Woehr
 -- Stability   : experimental
@@ -64,7 +64,7 @@ newtype FlipApp (a :: *) (f :: * -> *) = FlipApp (f a)
 
 -- | Apply a function to the variant within a 'VarF'.
 --
--- @since 1.0.0
+-- @since 1.0
 mapVarF :: (Var (ApplyRow x u) -> Var (ApplyRow x v)) -> VarF u x -> VarF v x
 mapVarF f (VarF v) = VarF (f v)
 
@@ -75,7 +75,7 @@ mapVarF f (VarF v) = VarF (f v)
 --
 --   For an example, see the 'Show1' instance implementation.
 --
--- @since 1.0.0
+-- @since 1.0
 varFAlg
   :: forall (c :: (* -> *) -> Constraint) (r :: Row (* -> *)) (x :: *) (y :: *)
    . (Forall r c)
@@ -106,7 +106,7 @@ varFAlg f =
 
 -- | The same as 'varFAlg', but with the constraint fixed to 'Unconstrained1'.
 --
--- @since 1.0.0
+-- @since 1.0
 varFAlg'
   :: forall (r :: Row (* -> *)) (x :: *) (y :: *)
    . (Forall r Unconstrained1)
@@ -128,7 +128,7 @@ type family RowFromToR (a :: [LT *]) (b :: *) :: [LT *] where
 -- corresponding rows from the input. Type errors will ensue if the record
 -- contains fields of the output variant.
 --
--- @since 1.0.0
+-- @since 1.0
 reduceVarF
   :: forall r s t x r' s' t'
    . ( t ≈ r .\\ s
@@ -193,6 +193,34 @@ instance Forall r Eq1 => Eq1 (VarF r) where
           doCons _ (Left (Const w))  = Const w
           doCons _ (Right (Const w)) = Const w
 
+instance (Forall r Ord1, Forall r Eq1) => Ord1 (VarF r) where
+  liftCompare :: forall a b. (a -> b -> Ordering) -> VarF r a -> VarF r b -> Ordering
+  liftCompare f (VarF x) (VarF y) = getConst $ metamorph' @_ @r @Ord1
+      @(Product (VarF' a) (VarF' b)) @(Const Ordering) @(Const Ordering)
+      Proxy doNil doUncons doCons (Pair (VarF' x) (VarF' y))
+    where doNil :: Product (VarF' a) (VarF' b) Empty -> Const Ordering Empty
+          doNil _ = undefined
+
+          doUncons :: forall ℓ τ ρ. (KnownSymbol ℓ, Ord1 τ)
+                   => Label ℓ
+                   -> Product (VarF' a) (VarF' b) ('R (ℓ ':-> τ ': ρ))
+                   -> Either (Const Ordering τ)
+                             (Product (VarF' a) (VarF' b) ('R ρ))
+          doUncons l (Pair (VarF' r1) (VarF' r2)) =
+            case (trial r1 l, trial r2 l) of
+              (Left u, Left v)   -> Left $ Const $ liftCompare f u v
+              (Right u, Right v) -> Right $ Pair (VarF' u) (VarF' v)
+              -- 
+              (Left _, Right _)  -> undefined
+              (Right _, Left _)  -> undefined
+
+          doCons :: forall ℓ (τ :: * -> *) ρ
+                  . Label ℓ
+                 -> Either (Const Ordering τ) (Const Ordering ('R ρ))
+                 -> Const Ordering ('R (ℓ ':-> τ ': ρ))
+          doCons _ (Left (Const w))  = Const w
+          doCons _ (Right (Const w)) = Const w
+
 instance Forall r Show1 => Show1 (VarF r) where
   liftShowsPrec ::
     forall a. (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> VarF r a -> ShowS
@@ -209,7 +237,7 @@ instance Forall r Show1 => Show1 (VarF r) where
 --   The order of variables are in the same order as the equality constraint
 --   in the synonym, making it easy to remember.
 --
--- @since 1.0.0
+-- @since 1.0
 type OpenAlg r l f v = ( ApplyRow v r .! l ≈ f v
                        , AllUniqueLabels (ApplyRow v r)
                        )

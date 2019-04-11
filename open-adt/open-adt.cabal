@@ -5,7 +5,7 @@ category:      Data
 build-type:    Simple
 license:       BSD3
 license-file:  LICENSE
-copyright:     Copyright (c) 2018 Jordan Woehr
+copyright:     Copyright (c) 2018-2019 Jordan Woehr
 maintainer:    Jordan Woehr
 homepage:      https://github.com/woehr/open-adt
 bug-reports:   https://github.com/woehr/open-adt/issues
