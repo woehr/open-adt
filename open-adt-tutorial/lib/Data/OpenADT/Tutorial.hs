@@ -543,6 +543,31 @@ result7 = cata alg exList2 where
   r = #cons2F .== \(Cons2F' a b x) ->
         Cons1 ("(" <> show a <> " : " <> show b <> ")") x
 
+-- * Ordering
+--
+-- $ord
+-- OpenADT data types are orderable provided all the underlying types are
+-- orderable. When determining the order of two values with different structure
+-- (note that this means the _types_ within the VarF variant are different),
+-- open-adt uses the ordering of the underlying labels, which is alphabetical.
+-- This is the same method used in the Ord instance for 'Var' in the row-types
+-- package.
+
+-- | Demonstrate the ordering of row types.
+--
+-- Consider the following comparisons of List2's.
+--
+-- > >>> compare (Cons1 2 Nil) (Cons2 0 0 Nil :: List2 Int)
+-- > LT
+--
+-- > >>> compare (Cons1 2 Nil) (Cons1 1 Nil :: List2 Int)
+-- > GT
+--
+-- In the first example the Cons1 label ("cons1F") is less than the Cons2 label
+-- ("cons2F").
+-- In the second example the head of both lists is the same, so the first list
+-- is greater since 2 > 1.
+
 -- | This is the function invoked by the executable in this package. It simply
 -- prints out the examples.
 main' :: IO ()

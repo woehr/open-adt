@@ -32,7 +32,6 @@ import           Data.Constraint
 import           Data.Functor.Classes
 import           Data.Functor.Const
 import           Data.Functor.Product
-import           Data.Maybe                               ( fromMaybe )
 import           Data.Proxy
 import           Data.Row
 import           Data.Row.Internal
@@ -52,6 +51,7 @@ type family ApplyLT (x :: *) (r :: [LT (* -> *)]) :: [LT *] where
 newtype VarF (r :: Row (* -> *)) x = VarF { unVarF :: Var (ApplyRow x r) }
 
 deriving instance Forall (ApplyRow x r) Eq => Eq (VarF r x)
+deriving instance (Forall (ApplyRow x r) Eq, Forall (ApplyRow x r) Ord) => Ord (VarF r x)
 deriving instance Forall (ApplyRow x r) Show => Show (VarF r x)
 
 -- | A helper for writing functions with 'metamorph''. This type reverses the
@@ -146,6 +146,9 @@ reduceVarF f (VarF v) = case multiTrial @t' @r' v of
   Left  x -> caseon f x
   Right x -> VarF x
 
+-- |
+--
+-- @since 1.0
 instance Forall r Functor => Functor (VarF r) where
   fmap :: forall a b. (a -> b) -> VarF r a -> VarF r b
   fmap f = VarF . unVarF' . go . VarF' . unVarF
@@ -165,41 +168,47 @@ instance Forall r Functor => Functor (VarF r) where
       doCons l (Left (FlipApp x)) = VarF' $ unsafeMakeVar l $ f <$> x
       doCons _ (Right (VarF' v)) = VarF' $ unsafeInjectFront v
 
+-- |
+--
+-- @since 1.0
 instance Forall r Eq1 => Eq1 (VarF r) where
   liftEq :: forall a b. (a -> b -> Bool) -> VarF r a -> VarF r b -> Bool
-  liftEq f (VarF x) (VarF y) = fromMaybe False $ getConst $ metamorph' @_ @r @Eq1
-      @(Product (VarF' a) (VarF' b)) @(Const (Maybe Bool)) @(Const (Maybe Bool))
+  liftEq f (VarF x) (VarF y) = getConst $ metamorph' @_ @r @Eq1
+      @(Product (VarF' a) (VarF' b)) @(Const Bool) @(Const Bool)
       Proxy doNil doUncons doCons (Pair (VarF' x) (VarF' y))
 
     where doNil :: Product (VarF' a) (VarF' b) Empty
-                -> Const (Maybe Bool) (Empty :: Row (* -> *))
-          doNil _ = Const Nothing
+                -> Const Bool (Empty :: Row (* -> *))
+          doNil (Pair (VarF' z) _) = Const (impossible z)
 
           doUncons :: forall ℓ τ ρ. (KnownSymbol ℓ, Eq1 τ)
                    => Label ℓ
                    -> Product (VarF' a) (VarF' b) ('R (ℓ ':-> τ ': ρ))
-                   -> Either (Const (Maybe Bool) τ)
+                   -> Either (Const Bool τ)
                              (Product (VarF' a) (VarF' b) ('R ρ))
           doUncons l (Pair (VarF' r1) (VarF' r2)) =
             case (trial r1 l, trial r2 l) of
-              (Left u, Left v)   -> Left $ Const $ Just $ liftEq f u v
+              (Left u, Left v)   -> Left $ Const $ liftEq f u v
               (Right u, Right v) -> Right $ Pair (VarF' u) (VarF' v)
-              _                  -> Left $ Const Nothing
+              _                  -> Left $ Const False
 
           doCons :: forall ℓ (τ :: * -> *) ρ
                   . Label ℓ
-                 -> Either (Const (Maybe Bool) τ) (Const (Maybe Bool) ('R ρ))
-                 -> Const (Maybe Bool) ('R (ℓ ':-> τ ': ρ))
+                 -> Either (Const Bool τ) (Const Bool ('R ρ))
+                 -> Const Bool ('R (ℓ ':-> τ ': ρ))
           doCons _ (Left (Const w))  = Const w
           doCons _ (Right (Const w)) = Const w
 
-instance (Forall r Ord1, Forall r Eq1) => Ord1 (VarF r) where
+-- |
+--
+-- @since 1.1
+instance (Forall r Eq1, Forall r Ord1) => Ord1 (VarF r) where
   liftCompare :: forall a b. (a -> b -> Ordering) -> VarF r a -> VarF r b -> Ordering
   liftCompare f (VarF x) (VarF y) = getConst $ metamorph' @_ @r @Ord1
       @(Product (VarF' a) (VarF' b)) @(Const Ordering) @(Const Ordering)
       Proxy doNil doUncons doCons (Pair (VarF' x) (VarF' y))
     where doNil :: Product (VarF' a) (VarF' b) Empty -> Const Ordering Empty
-          doNil _ = undefined
+          doNil (Pair (VarF' z) _) = Const (impossible z)
 
           doUncons :: forall ℓ τ ρ. (KnownSymbol ℓ, Ord1 τ)
                    => Label ℓ
@@ -208,11 +217,10 @@ instance (Forall r Ord1, Forall r Eq1) => Ord1 (VarF r) where
                              (Product (VarF' a) (VarF' b) ('R ρ))
           doUncons l (Pair (VarF' r1) (VarF' r2)) =
             case (trial r1 l, trial r2 l) of
-              (Left u, Left v)   -> Left $ Const $ liftCompare f u v
+              (Left u,  Left v)  -> Left $ Const $ liftCompare f u v
+              (Left _,  Right _) -> Left $ Const LT
+              (Right _, Left _)  -> Left $ Const GT
               (Right u, Right v) -> Right $ Pair (VarF' u) (VarF' v)
-              -- 
-              (Left _, Right _)  -> undefined
-              (Right _, Left _)  -> undefined
 
           doCons :: forall ℓ (τ :: * -> *) ρ
                   . Label ℓ
@@ -221,6 +229,9 @@ instance (Forall r Ord1, Forall r Eq1) => Ord1 (VarF r) where
           doCons _ (Left (Const w))  = Const w
           doCons _ (Right (Const w)) = Const w
 
+-- |
+--
+-- @since 1.0
 instance Forall r Show1 => Show1 (VarF r) where
   liftShowsPrec ::
     forall a. (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> VarF r a -> ShowS
