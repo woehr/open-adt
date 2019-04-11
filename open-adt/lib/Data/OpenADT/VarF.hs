@@ -50,8 +50,11 @@ type family ApplyLT (x :: *) (r :: [LT (* -> *)]) :: [LT *] where
 --   __(* -> *)__ that all have the type __x__ applied to them with 'ApplyRow'.
 newtype VarF (r :: Row (* -> *)) x = VarF { unVarF :: Var (ApplyRow x r) }
 
+-- | @since 1.0
 deriving instance Forall (ApplyRow x r) Eq => Eq (VarF r x)
+-- | @since 1.1
 deriving instance (Forall (ApplyRow x r) Eq, Forall (ApplyRow x r) Ord) => Ord (VarF r x)
+-- | @since 1.0
 deriving instance Forall (ApplyRow x r) Show => Show (VarF r x)
 
 -- | A helper for writing functions with 'metamorph''. This type reverses the
@@ -146,9 +149,7 @@ reduceVarF f (VarF v) = case multiTrial @t' @r' v of
   Left  x -> caseon f x
   Right x -> VarF x
 
--- |
---
--- @since 1.0
+-- | @since 1.0
 instance Forall r Functor => Functor (VarF r) where
   fmap :: forall a b. (a -> b) -> VarF r a -> VarF r b
   fmap f = VarF . unVarF' . go . VarF' . unVarF
@@ -168,9 +169,7 @@ instance Forall r Functor => Functor (VarF r) where
       doCons l (Left (FlipApp x)) = VarF' $ unsafeMakeVar l $ f <$> x
       doCons _ (Right (VarF' v)) = VarF' $ unsafeInjectFront v
 
--- |
---
--- @since 1.0
+-- | @since 1.0
 instance Forall r Eq1 => Eq1 (VarF r) where
   liftEq :: forall a b. (a -> b -> Bool) -> VarF r a -> VarF r b -> Bool
   liftEq f (VarF x) (VarF y) = getConst $ metamorph' @_ @r @Eq1
@@ -199,9 +198,7 @@ instance Forall r Eq1 => Eq1 (VarF r) where
           doCons _ (Left (Const w))  = Const w
           doCons _ (Right (Const w)) = Const w
 
--- |
---
--- @since 1.1
+-- | @since 1.1
 instance (Forall r Eq1, Forall r Ord1) => Ord1 (VarF r) where
   liftCompare :: forall a b. (a -> b -> Ordering) -> VarF r a -> VarF r b -> Ordering
   liftCompare f (VarF x) (VarF y) = getConst $ metamorph' @_ @r @Ord1
@@ -229,9 +226,7 @@ instance (Forall r Eq1, Forall r Ord1) => Ord1 (VarF r) where
           doCons _ (Left (Const w))  = Const w
           doCons _ (Right (Const w)) = Const w
 
--- |
---
--- @since 1.0
+-- | @since 1.0
 instance Forall r Show1 => Show1 (VarF r) where
   liftShowsPrec ::
     forall a. (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> VarF r a -> ShowS

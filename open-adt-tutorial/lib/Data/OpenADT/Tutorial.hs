@@ -125,7 +125,7 @@ deriveShow1 ''Cons2F
 -- corresponding types. The type operator ('.==') is used to associate a label
 -- with its type, the result of which is a row; ('.+') is used to combine two
 -- rows into a new row. These operators, and the 'Row' type, are defined in
--- the row-types package.
+-- the [row-types](https://hackage.haskell.org/package/row-types) package.
 
 -- | The row of the first list type. It defines a \"standard\" list type.
 type List1RowF a = ( "nilF"   .== NilF
@@ -292,7 +292,8 @@ result1 = cata
 -- To convert an ADT of one type to another with /fewer/ constructors, we need
 -- to specify how constructors are removed should they exist in the structure.
 -- The function 'reduceVarF' removes the constructors in a structure
--- corresponding to the fields of the record ('Rec' from row-types) of its
+-- corresponding to the fields of the record ('Data.Row.Records.Rec' from
+-- [row-types](https://hackage.haskell.org/package/row-types)) of its
 -- first argument. This function may only be used to remove constructors; it
 -- can not add or modify them. More specifically, it is constrained such that
 -- the set of labels of the row of the input record must be exactly the set
@@ -548,12 +549,10 @@ result7 = cata alg exList2 where
 -- $ord
 -- OpenADT data types are orderable provided all the underlying types are
 -- orderable. When determining the order of two values with different structure
--- (note that this means the _types_ within the VarF variant are different),
+-- (note that this means the /types/ within the 'VarF' variant are different),
 -- open-adt uses the ordering of the underlying labels, which is alphabetical.
--- This is the same method used in the Ord instance for 'Var' in the row-types
--- package.
-
--- | Demonstrate the ordering of row types.
+-- This is the same method used in the Ord instance for 'Data.Row.Variants.Var'
+-- in the [https://hackage.haskell.org/package/row-types](row-types) package.
 --
 -- Consider the following comparisons of List2's.
 --
@@ -563,7 +562,7 @@ result7 = cata alg exList2 where
 -- > >>> compare (Cons1 2 Nil) (Cons1 1 Nil :: List2 Int)
 -- > GT
 --
--- In the first example the Cons1 label ("cons1F") is less than the Cons2 label
+-- In the first example the 'Cons1' label ("cons1F") is less than the 'Cons2' label
 -- ("cons2F").
 -- In the second example the head of both lists is the same, so the first list
 -- is greater since 2 > 1.
